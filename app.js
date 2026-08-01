@@ -1156,9 +1156,36 @@ function closeIntro() {
   saveState();
   if (!introReplay) {
     if (profileIncomplete()) openWizard();
-    else handleIncomingLinks();
+    else showHero();
   }
 }
+
+/* écran de personnage, comme au lancement d'une partie */
+function showHero() {
+  const info = levelInfo(state.xp || 0);
+  $("#hero-crest").innerHTML = profilePortraitSvg();
+  $("#hero-name").textContent = state.profile.name;
+  $("#hero-titre").textContent = info.titre;
+  $("#hero-niveau").textContent = `Niveau ${info.niveau} — ${state.xp || 0} points d'expérience`;
+  const fill = $("#hero-xp-fill");
+  if (info.next) {
+    const span = info.next.xp - info.floor;
+    fill.style.width = `${Math.min(100, Math.round((((state.xp || 0) - info.floor) / span) * 100))}%`;
+  } else {
+    fill.style.width = "100%";
+  }
+  $("#modal-hero").hidden = false;
+}
+
+$("#hero-continue").addEventListener("click", () => {
+  $("#modal-hero").hidden = true;
+  handleIncomingLinks();
+});
+
+$("#hero-edit").addEventListener("click", () => {
+  $("#modal-hero").hidden = true;
+  openWizard();
+});
 
 $("#intro-next").addEventListener("click", () => {
   if (introStep < INTRO_CHAPTERS.length - 1) {
@@ -1387,8 +1414,14 @@ function openWizard() {
   }
   wizard.step = 0;
   renderWizardStep();
+  $("#wizard-cancel-row").hidden = profileIncomplete();
   $("#modal-onboard").hidden = false;
 }
+
+$("#wizard-cancel").addEventListener("click", () => {
+  $("#modal-onboard").hidden = true;
+  handleIncomingLinks();
+});
 
 $("#wizard-back").addEventListener("click", () => {
   if (wizard.step > 0) { wizard.step--; renderWizardStep(); }

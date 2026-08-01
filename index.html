@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
-  <link rel="stylesheet" href="styles.css?v=9">
+  <link rel="stylesheet" href="styles.css?v=10">
 </head>
 <body>
 
@@ -254,6 +254,7 @@
         <button type="button" class="btn btn-ghost" id="wizard-back">Retour</button>
         <button type="button" class="btn btn-primary" id="wizard-next">Continuer</button>
       </div>
+      <p class="intro-skip-row" id="wizard-cancel-row" hidden><button class="link-btn" id="wizard-cancel">Renoncer aux modifications</button></p>
     </div>
   </div>
 
@@ -269,6 +270,22 @@
         <button class="btn btn-primary" id="intro-next">Poursuivre</button>
       </div>
       <p class="intro-skip-row"><button class="link-btn" id="intro-skip">Passer le Préambule</button></p>
+    </div>
+  </div>
+
+  <!-- ==================== MODALE : VOTRE PERSONNAGE ==================== -->
+  <div class="modal-backdrop" id="modal-hero" hidden>
+    <div class="modal hero" role="dialog" aria-modal="true">
+      <h2 class="modal-title">Votre personnage</h2>
+      <div class="hero-crest" id="hero-crest"></div>
+      <div class="hero-name" id="hero-name">—</div>
+      <div class="hero-titre" id="hero-titre">—</div>
+      <div class="hero-niveau" id="hero-niveau">—</div>
+      <div class="xp-track hero-xp"><div class="xp-fill" id="hero-xp-fill"></div></div>
+      <div class="hero-actions">
+        <button class="btn btn-primary" id="hero-continue">Poursuivre l&rsquo;aventure</button>
+        <button class="btn btn-ghost" id="hero-edit">Modifier mon personnage</button>
+      </div>
     </div>
   </div>
 
@@ -291,6 +308,6 @@
 
   <script src="vendor/leaflet/leaflet.js"></script>
   <script src="vendor/qrcode/qrcode.js"></script>
-  <script src="app.js?v=9"></script>
+  <script src="app.js?v=10"></script>
 </body>
 </html>

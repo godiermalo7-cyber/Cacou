@@ -848,3 +848,15 @@ textarea, input[type="text"] { border-radius: 12px; }
 
 .intro-skip-row { text-align: center; margin-top: 0.5rem; }
 .intro-skip-row .link-btn { color: var(--ink-faint); font-size: 0.8rem; }
+
+/* ---------- Écran de personnage ---------- */
+
+.modal.hero { max-width: 380px; text-align: center; }
+.hero-crest { width: 122px; margin: 0.9rem auto 0.5rem; color: var(--ink); }
+.hero-crest svg { width: 122px; height: 122px; }
+.hero-name { font-size: 1.45rem; font-weight: 600; }
+.hero-titre { font-variant: small-caps; letter-spacing: 0.13em; color: var(--gold); }
+.hero-niveau { font-size: 0.85rem; color: var(--ink-faint); margin-bottom: 0.55rem; }
+.hero-xp { margin: 0 auto 1rem; max-width: 230px; }
+.hero-actions { display: flex; flex-direction: column; gap: 0.6rem; align-items: center; }
+.hero-actions .btn { min-width: 15rem; }
