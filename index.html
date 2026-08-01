@@ -20,6 +20,18 @@
 </head>
 <body>
 
+  <!-- rituel d'ouverture -->
+  <div id="splash" role="presentation" title="Toucher pour entrer">
+    <svg class="splash-seal" viewBox="0 0 120 120" aria-hidden="true">
+      <circle class="s-ring1" cx="60" cy="60" r="52"/>
+      <circle class="s-ring2" cx="60" cy="60" r="44"/>
+      <circle class="s-dot" cx="60" cy="60" r="20"/>
+      <circle class="s-core" cx="60" cy="60" r="8"/>
+    </svg>
+    <div class="splash-word">CACOU</div>
+    <div class="splash-sub">Le Cercle vous attend</div>
+  </div>
+
   <header class="masthead">
     <div class="masthead-inner">
       <div class="masthead-rule"></div>
@@ -201,9 +213,13 @@
 
   <!-- ==================== MODALE : BRISTOL ==================== -->
   <div class="modal-backdrop" id="modal-bristol" hidden>
-    <div class="modal" role="dialog" aria-modal="true">
-      <h2 class="modal-title">L&rsquo;échelle de Bristol</h2>
-      <p class="sheet-sub">Classification médicale tout à fait sérieuse, publiée en 1997 à Bristol, Angleterre.</p>
+    <div class="modal modal-wide" role="dialog" aria-modal="true">
+      <h2 class="modal-title">Le Grimoire de Bristol</h2>
+      <p class="sheet-sub">Les Saintes Écritures du Cercle — et une classification médicale parfaitement authentique.</p>
+      <div class="bristol-lore">
+        <p>En 1997, en la cité de Bristol, Angleterre, le docteur Ken Heaton et son équipe de l&rsquo;Université gravèrent dans le marbre médical une échelle en sept types, décrivant toutes les formes que peut prendre une commission. Publiée dans une revue savante, enseignée aux médecins, elle est aujourd&rsquo;hui la doctrine officielle du Cercle.</p>
+        <p>Sa lecture est simple : l&rsquo;échelle mesure le <em>temps de transit</em>. Types I et II — le voyage fut trop long : buvez, mangez des fibres, marchez. Types III et IV — l&rsquo;équilibre du sage, le IV étant l&rsquo;idéal absolu. Types V à VII — le voyage fut trop court : douceur, repos, hydratation. <em>Et si le Type VII s&rsquo;installe plusieurs jours, consultez un véritable médecin : le Cercle connaît ses limites.</em></p>
+      </div>
       <ol class="bristol-legend" id="bristol-legend"></ol>
       <div class="modal-actions">
         <button class="btn btn-primary" id="bristol-close">Fort instructif</button>

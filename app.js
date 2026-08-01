@@ -1100,6 +1100,12 @@ const INTRO_CHAPTERS = [
       <p>Réunis en conscience, ils ont fondé <em>le Cercle</em> : une société discrète, vouée à un art que le siècle avait perdu — celui de se souvenir. Chaque événement, consigné. Chaque lieu, cartographié. Chaque détail, documenté avec la rigueur d'un notaire et la fierté d'un explorateur.</p>`,
   },
   {
+    title: "La Doctrine",
+    html: `<p>Toute société a ses écritures. Le Cercle a les siennes : <em>l'échelle de Bristol</em>.</p>
+      <p>En 1997, en la cité de Bristol, le docteur Ken Heaton grava dans le marbre médical une classification en sept types — du Type I, billes dures du pénitent, au Type VII, torrent sans forme des jours de défaite. Science authentique, publiée dans les revues savantes, enseignée aux médecins, révérée par le Cercle.</p>
+      <p>Chaque événement y trouve son nom, son rang et son verdict. Le Type IV, <em>serpent débonnaire</em>, demeure l'idéal vers lequel tendent les sages.</p>`,
+  },
+  {
     title: "Les Usages",
     html: `<p>Au Cercle, on consigne ses événements sur la grande carte, et l'on dresse procès-verbal : échelle de Bristol, appréciation, durée, contexte, empreinte sonore.</p>
       <p>On s'élève en grade — de <em>Novice du Trône</em> à <em>Légende Vivante</em>. On accomplit la quête du jour. On correspond par télégramme avec ses pairs. Et l'on n'en parle à personne — hormis, naturellement, à tout son réseau.</p>
@@ -1580,6 +1586,22 @@ function renderAll() {
 }
 
 $("#levelup-close").addEventListener("click", () => { $("#modal-levelup").hidden = true; });
+
+/* rituel d'ouverture : le sceau se dessine, puis s'efface */
+(function splashRitual() {
+  const splash = $("#splash");
+  if (!splash) return;
+  let closed = false;
+  const close = () => {
+    if (closed) return;
+    closed = true;
+    splash.classList.add("is-done");
+    setTimeout(() => { splash.hidden = true; }, 550);
+  };
+  splash.addEventListener("click", close);
+  const quick = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  setTimeout(close, quick ? 350 : 2000);
+})();
 
 renderBristolLegend();
 applyTheme();
