@@ -17,6 +17,31 @@
   --mono: "Courier Prime", "Courier New", monospace;
 }
 
+/* Édition de nuit : le même registre, à la lueur de la lampe à huile */
+:root[data-theme="nuit"] {
+  --paper: #211c15;
+  --paper-deep: #2a241a;
+  --ink: #e6dcc6;
+  --ink-soft: #b3a78c;
+  --ink-faint: #6e6450;
+  --accent: #a9744b;
+  --accent-deep: #c08a5e;
+  --seal: #c05540;
+  --line: #3c3527;
+}
+:root[data-theme="nuit"] body {
+  background-image: radial-gradient(rgba(230, 220, 198, 0.03) 1px, transparent 1px);
+}
+:root[data-theme="nuit"] .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) grayscale(0.85) sepia(0.28) brightness(0.85) contrast(0.95);
+}
+:root[data-theme="nuit"] .sheet,
+:root[data-theme="nuit"] .friend-card { background: rgba(255, 253, 247, 0.03); }
+:root[data-theme="nuit"] textarea,
+:root[data-theme="nuit"] input[type="text"] { background: rgba(255, 253, 247, 0.05); }
+:root[data-theme="nuit"] .modal.telegram { background: #2a241a; }
+:root[data-theme="nuit"] .qr-box svg { filter: invert(0.92) sepia(0.15); }
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html { scroll-behavior: smooth; }
@@ -31,6 +56,7 @@ body {
   /* grain de papier discret */
   background-image: radial-gradient(rgba(43, 38, 32, 0.028) 1px, transparent 1px);
   background-size: 5px 5px;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* ---------- En-tête ---------- */
@@ -85,7 +111,12 @@ body {
 
 main { max-width: 880px; margin: 0 auto; padding: 0 1rem 3rem; }
 .view { display: none; }
-.view.is-active { display: block; }
+.view.is-active { display: block; animation: view-in 0.25s ease; }
+@keyframes view-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+.nav-theme { color: var(--ink-faint); font-size: 0.9rem; }
 
 /* ---------- Carte ---------- */
 
@@ -227,6 +258,42 @@ main { max-width: 880px; margin: 0 auto; padding: 0 1rem 3rem; }
   font-family: var(--mono); font-size: 0.82rem; letter-spacing: 0.02em;
   background: var(--paper-deep); border: 1px dashed var(--ink-faint);
   padding: 0.5rem 0.7rem; margin-top: 0.3rem; text-transform: uppercase;
+  white-space: pre-line;
+}
+
+/* ---------- Carte de visite & correspondants réels ---------- */
+
+.visite-row { display: flex; gap: 1.4rem; align-items: center; flex-wrap: wrap; }
+.qr-box {
+  background: #fffdf7; border: 1px solid var(--ink);
+  outline: 1px solid var(--ink); outline-offset: 3px;
+  padding: 0.6rem; line-height: 0; flex: 0 0 auto;
+}
+.qr-box svg { width: 128px; height: 128px; }
+.visite-actions { display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-start; }
+.visite-name { font-weight: 600; font-size: 1.1rem; }
+.add-friend-row {
+  display: flex; gap: 0.6rem; margin-top: 1.2rem;
+  border-top: 1px dotted var(--line); padding-top: 1.1rem;
+}
+.add-friend-row input { flex: 1; }
+.friend-card.is-real { border-color: var(--accent); }
+.friend-seal {
+  font-variant: small-caps; letter-spacing: 0.08em; font-size: 0.72rem;
+  color: var(--seal); border: 1px solid var(--seal);
+  display: inline-block; padding: 0 0.4rem; transform: rotate(-1.5deg);
+  margin-bottom: 0.25rem;
+}
+
+/* ---------- Séparateur de mois (journal) ---------- */
+
+.journal-month {
+  font-variant: small-caps; letter-spacing: 0.16em; font-size: 0.85rem;
+  color: var(--ink-faint); text-align: center;
+  margin: 1.1rem 0 0.2rem; display: flex; align-items: center; gap: 0.8rem;
+}
+.journal-month::before, .journal-month::after {
+  content: ""; flex: 1; border-top: 1px solid var(--line);
 }
 
 /* ---------- Statistiques ---------- */
@@ -367,7 +434,12 @@ textarea:focus, input[type="text"]:focus { outline: 1px solid var(--accent); }
   text-transform: uppercase; letter-spacing: 0.04em;
   white-space: pre-line;
 }
-.telegram-foot { padding: 0 1.4rem 1.3rem; text-align: right; }
+.telegram-foot {
+  padding: 0 1.4rem 1.3rem; display: flex; justify-content: flex-end;
+  gap: 0.6rem; flex-wrap: wrap;
+}
+#telegram-share-row { display: inline-flex; gap: 0.6rem; }
+#telegram-share-row[hidden] { display: none; }
 
 /* ---------- Légende Bristol ---------- */
 

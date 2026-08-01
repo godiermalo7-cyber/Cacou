@@ -37,6 +37,8 @@
     <button class="nav-link" data-view="cercle">Le Cercle<span class="nav-badge" id="cercle-badge" hidden></span></button>
     <span class="nav-sep">·</span>
     <button class="nav-link" data-view="statistiques">Statistiques</button>
+    <span class="nav-sep">·</span>
+    <button class="nav-link nav-theme" id="theme-toggle" title="Basculer entre l'édition du jour et l'édition de nuit">☾ Nuit</button>
   </nav>
 
   <main>
@@ -68,8 +70,26 @@
     <!-- ==================== CERCLE ==================== -->
     <section class="view" id="view-cercle">
       <div class="sheet">
+        <h2 class="sheet-title">Votre carte de visite</h2>
+        <p class="sheet-sub">Faites scanner ce cachet par un ami (ou envoyez-lui le lien) : vous voilà correspondants.</p>
+        <div class="visite-row">
+          <div class="qr-box" id="qr-box" aria-label="Code QR de votre carte de visite"></div>
+          <div class="visite-actions">
+            <p class="visite-name" id="visite-name">—</p>
+            <button class="btn btn-ghost btn-small" id="btn-share-card">Envoyer ma carte</button>
+            <button class="btn btn-ghost btn-small" id="btn-copy-card">Copier le lien</button>
+          </div>
+        </div>
+        <div class="add-friend-row">
+          <input type="text" id="friend-code-input" placeholder="Coller ici le lien ou le code d'un ami…" autocomplete="off">
+          <button class="btn btn-primary btn-small" id="btn-add-friend">Enregistrer</button>
+        </div>
+      </div>
+      <div class="sheet">
         <h2 class="sheet-title">Le Cercle</h2>
-        <p class="sheet-sub">Vos correspondants. Des personnes de confiance, tenues au secret.</p>
+        <p class="sheet-sub" id="cercle-sub">Vos correspondants. Des personnes de confiance, tenues au secret.</p>
+        <div id="real-friends-list" class="friends-grid"></div>
+        <h3 class="sheet-h3">Correspondants d&rsquo;honneur <span class="optional">(personnages de fiction, en attendant les vôtres)</span></h3>
         <div id="friends-list" class="friends-grid"></div>
       </div>
       <div class="sheet">
@@ -87,6 +107,8 @@
         <div class="stat-row" id="stat-tiles"></div>
         <h3 class="sheet-h3">Répartition selon l&rsquo;échelle de Bristol</h3>
         <div id="bristol-chart" class="bristol-chart"></div>
+        <h3 class="sheet-h3">Assiduité hebdomadaire</h3>
+        <div id="weekday-chart" class="bristol-chart"></div>
         <h3 class="sheet-h3">Décorations &amp; distinctions</h3>
         <div id="badges-grid" class="badges-grid"></div>
         <div class="export-row">
@@ -155,6 +177,10 @@
       </div>
       <div class="telegram-body" id="telegram-body"></div>
       <div class="telegram-foot">
+        <span id="telegram-share-row" hidden>
+          <button class="btn btn-ghost" id="telegram-share">Transmettre</button>
+          <button class="btn btn-ghost" id="telegram-copy">Copier le lien</button>
+        </span>
         <button class="btn btn-primary" id="telegram-close">Reçu cinq sur cinq</button>
       </div>
     </div>
@@ -189,6 +215,7 @@
   <div class="toast" id="toast" hidden></div>
 
   <script src="vendor/leaflet/leaflet.js"></script>
+  <script src="vendor/qrcode/qrcode.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

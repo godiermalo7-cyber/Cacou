@@ -26,9 +26,12 @@ python3 -m http.server 8000
   - l'**empreinte sonore** (du « Silence monacal » au « Sismique ») ;
   - les **observations du greffier** en texte libre.
 - **Le Journal** — relevé chronologique numéroté, tenu comme un registre d'état civil.
-- **Le Cercle** — vos correspondants. Consultez la Gazette, apposez des réactions au tampon rouge (« Félicitations », « Courage », « Splendide », « Quelle santé »).
-- **Le Télégramme** — quand vous consignez un événement, avisez tout le Cercle par télégramme (« FAIT ACCOMPLI STOP »). Vous pouvez aussi adresser un télégramme individuel à un correspondant, depuis le trône.
-- **Statistiques** — total, note moyenne, lieux distincts, série de jours consécutifs, répartition Bristol.
+- **Le Cercle, avec de vrais amis** — chacun possède une **carte de visite** (QR code + lien). Faites-la scanner ou envoyez le lien : la personne devient un « correspondant certifié ». Aucun serveur, aucun compte : la connexion se fait par échange de codes.
+- **Le Télégramme, pour de vrai** — quand vous consignez un événement, un télégramme (« FAIT ACCOMPLI STOP ») est rédigé et vous pouvez le **transmettre par WhatsApp, SMS ou tout autre canal** via le bouton Transmettre. Quand votre ami ouvre le lien, le télégramme s'imprime dans sa Gazette et vous êtes automatiquement ajouté à ses correspondants. Idem pour le « poke » individuel, envoyé depuis le trône.
+- **La Gazette** — dépêches des correspondants (réels et d'honneur), réactions au tampon rouge (« Félicitations », « Courage », « Splendide », « Quelle santé »).
+- **L'Édition de nuit** — bascule ☾ dans la navigation : le registre s'éclaire à la lampe à huile, carte comprise.
+- **Statistiques** — total, note moyenne, lieux distincts, série de jours consécutifs, répartition Bristol, assiduité hebdomadaire.
+- **Hors ligne** — un service worker (stratégie « réseau d'abord ») rend l'app consultable sans connexion, tout en garantissant les mises à jour dès qu'on est en ligne.
 - **Décorations** — huit distinctions à conquérir, de « Première pierre » à « Bristol complet ».
 - **Export** — le registre s'exporte en JSON. Les archives peuvent aussi être brûlées.
 
@@ -38,4 +41,4 @@ Cacou n'expédie aucune donnée. Tout demeure dans le `localStorage` de votre na
 
 ## Pile technique
 
-HTML, CSS et JavaScript sans framework. [Leaflet](https://leafletjs.com) pour la carte, tuiles OpenStreetMap, typographies EB Garamond et Courier Prime.
+HTML, CSS et JavaScript sans framework. [Leaflet](https://leafletjs.com) pour la carte, tuiles OpenStreetMap, [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) pour les cartes de visite, typographies EB Garamond et Courier Prime. Les deux bibliothèques sont vendorisées dans `vendor/`.

@@ -77,11 +77,22 @@ const STORAGE_KEY = "cacou-state-v1";
 const state = loadState();
 
 function loadState() {
+  let s = null;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) s = JSON.parse(raw);
   } catch (e) { /* registre corrompu : on repart à neuf */ }
-  return { profile: null, entries: [], reactions: {}, telegramCount: 0, incomingSeen: false };
+  if (!s) s = { profile: null, entries: [], reactions: {}, telegramCount: 0, incomingSeen: false };
+  /* migrations douces */
+  if (!Array.isArray(s.realFriends)) s.realFriends = [];
+  if (!Array.isArray(s.receivedTelegrams)) s.receivedTelegrams = [];
+  if (!s.theme) s.theme = "jour";
+  if (s.profile && !s.profile.id) s.profile.id = newId("u");
+  return s;
+}
+
+function newId(prefix) {
+  return prefix + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
 
 function saveState() {
@@ -128,6 +139,44 @@ function relTime(hoursAgo) {
 function labelOf(list, id) {
   const found = list.find((x) => x.id === id);
   return found ? found.label : id;
+}
+
+/* codes portables (base64url d'un JSON) pour cartes de visite et télégrammes */
+
+function encodeCode(obj) {
+  return btoa(unescape(encodeURIComponent(JSON.stringify(obj))))
+    .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function decodeCode(str) {
+  let s = str.replace(/-/g, "+").replace(/_/g, "/");
+  while (s.length % 4) s += "=";
+  return JSON.parse(decodeURIComponent(escape(atob(s))));
+}
+
+function appUrl() {
+  return location.origin + location.pathname;
+}
+
+async function shareOrCopy(url, title) {
+  if (navigator.share) {
+    try {
+      await navigator.share({ title, url });
+      return true;
+    } catch (e) { /* partage annulé : on retombe sur la copie */ }
+  }
+  return copyText(url);
+}
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    toast("Copié. Confiez-le à qui vous voudrez.");
+    return true;
+  } catch (e) {
+    toast("Copie impossible — sélectionnez le texte à la main.");
+    return false;
+  }
 }
 
 let toastTimer = null;
@@ -316,7 +365,8 @@ $("#entry-form").addEventListener("submit", (e) => {
   const fresh = after.filter((id) => !before.includes(id));
 
   if (sendTelegram) {
-    showTelegram(outgoingTelegramText(entry));
+    const text = outgoingTelegramText(entry);
+    showTelegram(text, telegramShareLink(text));
   } else {
     toast("Procès-verbal scellé. Le registre vous remercie.");
   }
@@ -328,11 +378,15 @@ $("#entry-form").addEventListener("submit", (e) => {
 
 /* ---------- Télégrammes ---------- */
 
+function circleSize() {
+  return FRIENDS.length + state.realFriends.length;
+}
+
 function outgoingTelegramText(entry) {
   const lieu = entry.place ? entry.place.toUpperCase() : "POSITION CLASSIFIÉE";
   const b = BRISTOL.find((x) => x.n === entry.bristol);
   return [
-    `À : LE CERCLE (${FRIENDS.length} CORRESPONDANTS)`,
+    `À : LE CERCLE (${circleSize()} CORRESPONDANTS)`,
     ``,
     `FAIT ACCOMPLI STOP`,
     `LIEU : ${lieu} STOP`,
@@ -340,6 +394,15 @@ function outgoingTelegramText(entry) {
     `APPRÉCIATION : ${entry.note} ÉTOILE${entry.note > 1 ? "S" : ""} SUR CINQ STOP`,
     `AUCUNE RÉPONSE ATTENDUE STOP FIN`,
   ].join("\n");
+}
+
+function telegramShareLink(text) {
+  const payload = { v: 1, id: newId("t"), from: { id: state.profile.id, name: state.profile.name }, text, date: new Date().toISOString() };
+  return appUrl() + "?tg=" + encodeCode(payload);
+}
+
+function cardShareLink() {
+  return appUrl() + "?ami=" + encodeCode({ v: 1, id: state.profile.id, name: state.profile.name });
 }
 
 function pokeTelegramText(friend, me) {
@@ -363,12 +426,22 @@ function incomingTelegramText(me) {
   ].join("\n");
 }
 
-function showTelegram(text) {
+let currentShareUrl = null;
+
+function showTelegram(text, shareUrl) {
   $("#telegram-body").textContent = text;
+  currentShareUrl = shareUrl || null;
+  $("#telegram-share-row").hidden = !shareUrl;
   $("#modal-telegram").hidden = false;
 }
 
 $("#telegram-close").addEventListener("click", () => { $("#modal-telegram").hidden = true; });
+$("#telegram-share").addEventListener("click", () => {
+  if (currentShareUrl) shareOrCopy(currentShareUrl, "Télégramme Cacou");
+});
+$("#telegram-copy").addEventListener("click", () => {
+  if (currentShareUrl) copyText(currentShareUrl);
+});
 
 /* ---------- Journal ---------- */
 
@@ -379,7 +452,13 @@ function renderJournal() {
     box.appendChild(el("p", "empty-note", "Le registre est vierge. Cela ne saurait durer."));
     return;
   }
+  let lastMonth = null;
   state.entries.forEach((entry, i) => {
+    const month = new Date(entry.date).toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
+    if (month !== lastMonth) {
+      lastMonth = month;
+      box.appendChild(el("div", "journal-month", esc(month)));
+    }
     const num = state.entries.length - i;
     const b = BRISTOL.find((x) => x.n === entry.bristol);
     const row = el("div", "journal-entry");
@@ -436,6 +515,93 @@ function renderFriends() {
   });
 }
 
+function renderRealFriends() {
+  const box = $("#real-friends-list");
+  box.innerHTML = "";
+  if (!state.realFriends.length) {
+    box.appendChild(el("p", "empty-note",
+      "Aucun correspondant véritable pour l'heure. Partagez votre carte de visite ci-dessus : c'est ainsi que les grandes amitiés commencent."));
+    return;
+  }
+  state.realFriends.forEach((f) => {
+    const card = el("div", "friend-card is-real");
+    card.appendChild(el("div", "friend-seal", "Correspondant certifié"));
+    card.appendChild(el("div", "friend-name", esc(f.name)));
+    card.appendChild(el("div", "friend-stat", `Au registre depuis le ${esc(fmtDate(f.addedAt))}.`));
+    const btn = el("button", "btn btn-ghost btn-small", "Adresser un télégramme");
+    btn.addEventListener("click", () => {
+      state.telegramCount = (state.telegramCount || 0) + 1;
+      saveState();
+      renderBadges();
+      const text = pokeTelegramText(f, state.profile ? state.profile.name : "UN ANONYME");
+      showTelegram(text, telegramShareLink(text));
+    });
+    card.appendChild(btn);
+    const del = el("button", "btn btn-ghost btn-small btn-danger", "Rompre la correspondance");
+    del.style.marginTop = "0.4rem";
+    del.addEventListener("click", () => {
+      if (!confirm(`Rayer ${f.name} de vos correspondants ?`)) return;
+      state.realFriends = state.realFriends.filter((x) => x.id !== f.id);
+      saveState();
+      renderRealFriends();
+      toast("Correspondance rompue. Sans rancune, espérons-le.");
+    });
+    card.appendChild(del);
+    box.appendChild(card);
+  });
+}
+
+function addFriendFromCode(raw) {
+  let code = String(raw || "").trim();
+  if (!code) return toast("Le champ est vide, comme votre carnet d'adresses.");
+  const m = code.match(/[?&]ami=([A-Za-z0-9_-]+)/);
+  if (m) code = m[1];
+  code = code.replace(/^CACOU-/, "");
+  let data;
+  try {
+    data = decodeCode(code);
+    if (!data || !data.id || !data.name) throw new Error("invalide");
+  } catch (e) {
+    return toast("Ce code est illisible. Vérifiez la copie.");
+  }
+  if (state.profile && data.id === state.profile.id) {
+    return toast("S'ajouter soi-même ? L'introspection a ses limites.");
+  }
+  if (state.realFriends.some((f) => f.id === data.id)) {
+    return toast(`${data.name} figure déjà parmi vos correspondants.`);
+  }
+  state.realFriends.push({ id: data.id, name: String(data.name).slice(0, 24), addedAt: new Date().toISOString() });
+  saveState();
+  renderRealFriends();
+  toast(`${data.name} rejoint votre Cercle. Qu'on lui porte l'estime due.`);
+}
+
+function renderVisite() {
+  if (!state.profile) return;
+  $("#visite-name").textContent = state.profile.name;
+  const link = cardShareLink();
+  const qrBox = $("#qr-box");
+  qrBox.innerHTML = "";
+  try {
+    const qr = qrcode(0, "M");
+    qr.addData(link);
+    qr.make();
+    qrBox.innerHTML = qr.createSvgTag({ cellSize: 3, margin: 0 });
+  } catch (e) {
+    qrBox.textContent = "QR indisponible";
+  }
+}
+
+$("#btn-share-card").addEventListener("click", () => shareOrCopy(cardShareLink(), "Ma carte de visite Cacou"));
+$("#btn-copy-card").addEventListener("click", () => copyText(cardShareLink()));
+$("#btn-add-friend").addEventListener("click", () => {
+  addFriendFromCode($("#friend-code-input").value);
+  $("#friend-code-input").value = "";
+});
+$("#friend-code-input").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") { e.preventDefault(); $("#btn-add-friend").click(); }
+});
+
 function feedItems() {
   const items = [];
   FRIEND_FEED_SEED.forEach((seed, i) => {
@@ -447,6 +613,18 @@ function feedItems() {
       text: seed.text,
       quote: seed.quote,
       tg: seed.telegram ? seed.tg : null,
+      reactable: true,
+    });
+  });
+  state.receivedTelegrams.forEach((t) => {
+    const hoursAgo = (Date.now() - new Date(t.receivedAt).getTime()) / 3600000;
+    items.push({
+      id: "rt-" + t.id,
+      hoursAgo,
+      author: t.from,
+      text: "vous a adressé un télégramme.",
+      quote: null,
+      tg: t.text,
       reactable: true,
     });
   });
@@ -548,6 +726,24 @@ function renderStats() {
     row.appendChild(el("div", "bristol-bar-count", String(counts[i])));
     chart.appendChild(row);
   });
+
+  const wkChart = $("#weekday-chart");
+  wkChart.innerHTML = "";
+  const dayNames = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
+  const dayOrder = [1, 2, 3, 4, 5, 6, 0];
+  const wkCounts = dayOrder.map((d) => state.entries.filter((e) => new Date(e.date).getDay() === d).length);
+  const wkMax = Math.max(1, ...wkCounts);
+  dayNames.forEach((name, i) => {
+    const row = el("div", "bristol-bar-row");
+    row.appendChild(el("div", "bristol-bar-label", name));
+    const track = el("div", "bristol-bar-track");
+    const fill = el("div", "bristol-bar-fill");
+    fill.style.width = wkCounts[i] ? `${(wkCounts[i] / wkMax) * 100}%` : "0";
+    track.appendChild(fill);
+    row.appendChild(track);
+    row.appendChild(el("div", "bristol-bar-count", String(wkCounts[i])));
+    wkChart.appendChild(row);
+  });
 }
 
 function earnedBadgeIds() {
@@ -613,7 +809,7 @@ function showView(name) {
   }
 }
 
-document.querySelectorAll(".nav-link").forEach((btn) => {
+document.querySelectorAll(".nav-link[data-view]").forEach((btn) => {
   btn.addEventListener("click", () => showView(btn.dataset.view));
 });
 
@@ -630,9 +826,11 @@ $("#onboard-form").addEventListener("submit", (e) => {
   e.preventDefault();
   const name = $("#onboard-name").value.trim();
   if (!name) return;
-  state.profile = { name };
+  state.profile = { name, id: newId("u") };
   saveState();
   $("#modal-onboard").hidden = true;
+  renderAll();
+  handleIncomingLinks();
   toast(`Bienvenue, ${name}. Le registre vous attendait.`);
   setTimeout(() => {
     if (!state.incomingSeen && $("#modal-entry").hidden) {
@@ -644,22 +842,94 @@ $("#onboard-form").addEventListener("submit", (e) => {
   }, 900);
 });
 
+/* ---------- Édition de nuit ---------- */
+
+function applyTheme() {
+  document.documentElement.dataset.theme = state.theme;
+  $("#theme-toggle").textContent = state.theme === "nuit" ? "☀ Jour" : "☾ Nuit";
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.content = state.theme === "nuit" ? "#211c15" : "#f4efe4";
+}
+
+$("#theme-toggle").addEventListener("click", () => {
+  state.theme = state.theme === "nuit" ? "jour" : "nuit";
+  saveState();
+  applyTheme();
+  toast(state.theme === "nuit" ? "Édition de nuit. On baisse la lampe." : "Édition du jour. Bonjour à vous.");
+});
+
+/* ---------- Courrier entrant (liens ?ami= et ?tg=) ---------- */
+
+function handleIncomingLinks() {
+  const params = new URLSearchParams(location.search);
+  let touched = false;
+
+  const ami = params.get("ami");
+  if (ami) {
+    touched = true;
+    addFriendFromCode(ami);
+    showView("cercle");
+  }
+
+  const tg = params.get("tg");
+  if (tg) {
+    touched = true;
+    try {
+      const data = decodeCode(tg);
+      if (data && data.text && data.from && data.from.id !== (state.profile && state.profile.id)) {
+        if (!state.receivedTelegrams.some((t) => t.id === data.id)) {
+          state.receivedTelegrams.unshift({
+            id: data.id || newId("t"),
+            from: String(data.from.name || "Expéditeur inconnu").slice(0, 24),
+            fromId: data.from.id,
+            text: String(data.text).slice(0, 600),
+            receivedAt: new Date().toISOString(),
+          });
+          /* l'expéditeur devient correspondant, si ce n'est déjà fait */
+          if (data.from.id && data.from.name && !state.realFriends.some((f) => f.id === data.from.id)) {
+            state.realFriends.push({ id: data.from.id, name: String(data.from.name).slice(0, 24), addedAt: new Date().toISOString() });
+          }
+          saveState();
+          renderRealFriends();
+          renderFeed();
+        }
+        showTelegram(String(data.text).slice(0, 600));
+        $("#cercle-badge").hidden = false;
+      }
+    } catch (e) {
+      toast("Un télégramme est arrivé illisible. Les Postes s'en excusent.");
+    }
+  }
+
+  if (touched) history.replaceState(null, "", location.pathname);
+}
+
 /* ---------- Démarrage ---------- */
 
 function renderAll() {
   renderMarkers();
   renderJournal();
   renderFriends();
+  renderRealFriends();
+  renderVisite();
   renderFeed();
   renderStats();
   renderBadges();
 }
 
 renderBristolLegend();
+applyTheme();
 renderAll();
 
 if (!state.profile) {
   $("#modal-onboard").hidden = false;
-} else if (state.entries.length && state.entries[0].lat) {
-  map.setView([state.entries[0].lat, state.entries[0].lng], 12);
+} else {
+  handleIncomingLinks();
+  if (state.entries.length && state.entries[0].lat) {
+    map.setView([state.entries[0].lat, state.entries[0].lng], 12);
+  }
+}
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js").catch(() => { /* hors ligne indisponible, tant pis */ });
 }
