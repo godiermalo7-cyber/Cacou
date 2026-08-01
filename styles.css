@@ -646,3 +646,99 @@ textarea:focus, input[type="text"]:focus { outline: 1px solid var(--accent); }
   .je-comment, .je-actions { grid-column: 1 / 3; }
   .feed-time { flex-basis: 4rem; }
 }
+
+/* ============================================================
+   REFONTE DOUCE — rondeurs, ombres soyeuses, matières.
+   Le registre garde son âme ; il gagne en velours.
+   ============================================================ */
+
+:root {
+  --radius: 14px;
+  --shadow-soft: 0 10px 30px rgba(43, 38, 32, 0.10), 0 2px 8px rgba(43, 38, 32, 0.05);
+  --shadow-lift: 0 18px 44px rgba(43, 38, 32, 0.16), 0 4px 12px rgba(43, 38, 32, 0.08);
+}
+:root[data-theme="nuit"] {
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.35);
+  --shadow-lift: 0 18px 44px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* navigation en pastille, façon barre de jeu */
+.nav {
+  gap: 0.1rem; background: rgba(43, 38, 32, 0.055);
+  border-radius: 999px; width: max-content; max-width: calc(100% - 2rem);
+  margin: 0 auto 1.5rem; padding: 0.32rem 0.4rem; flex-wrap: nowrap;
+  overflow-x: auto; scrollbar-width: none;
+}
+.nav::-webkit-scrollbar { display: none; }
+:root[data-theme="nuit"] .nav { background: rgba(255, 253, 247, 0.07); }
+.nav-sep { display: none; }
+.nav-link {
+  padding: 0.4rem 0.9rem; border-radius: 999px; border-bottom: none;
+  white-space: nowrap; transition: all 0.18s ease;
+}
+.nav-link.is-active { background: var(--ink); color: var(--paper); border-bottom: none; }
+.nav-link.is-active .nav-glyph { opacity: 0.9; }
+
+/* feuilles, cartes et cadres */
+.sheet {
+  border-radius: var(--radius); box-shadow: var(--shadow-soft);
+  background: rgba(255, 253, 247, 0.78);
+}
+:root[data-theme="nuit"] .sheet { background: rgba(255, 253, 247, 0.045); }
+.map-frame {
+  border-radius: var(--radius); overflow: hidden; outline: none;
+  border-color: var(--line); box-shadow: var(--shadow-soft);
+}
+.map-banner { border-radius: 999px; }
+.friend-card, .attr-card, .badge, .car-slide, .stat-tile, .quest-card, .qr-box { border-radius: var(--radius); }
+.qr-box { outline: none; box-shadow: var(--shadow-soft); }
+.quest-card { box-shadow: var(--shadow-soft); border-left-width: 4px; }
+.stat-tile { transition: all 0.18s ease; background: rgba(255, 253, 247, 0.5); }
+.stat-tile:hover { transform: translateY(-2px); box-shadow: var(--shadow-soft); }
+:root[data-theme="nuit"] .stat-tile,
+:root[data-theme="nuit"] .car-slide { background: rgba(255, 253, 247, 0.04); }
+
+/* boutons et commandes */
+.btn { border-radius: 999px; padding: 0.5rem 1.35rem; }
+.btn:hover { box-shadow: var(--shadow-soft); transform: translateY(-1px); }
+.btn:active { transform: translateY(0); box-shadow: none; }
+.seg button, .reaction-btn { border-radius: 999px; }
+.seg button { padding: 0.32rem 0.85rem; }
+textarea, input[type="text"] { border-radius: 12px; }
+.car-arrow, .opt-arrow, .symbol-btn { border-radius: 12px; }
+
+/* modales */
+.modal { border-radius: var(--radius); outline: none; box-shadow: var(--shadow-lift); }
+.modal.telegram { border-radius: 8px; }
+.leaflet-popup-content-wrapper { border-radius: 12px; box-shadow: var(--shadow-soft); border-color: var(--line); }
+
+/* jauges en dégradé */
+.xp-track, .bristol-bar-track { border-radius: 999px; overflow: hidden; }
+.xp-fill, .bristol-bar-fill { background: linear-gradient(90deg, var(--accent), var(--accent-deep)); }
+
+.toast { border-radius: 999px; box-shadow: var(--shadow-lift); padding: 0.6rem 1.5rem; }
+
+/* ---------- Le Préambule (intro narrative) ---------- */
+
+.modal.intro { max-width: 500px; text-align: center; padding: 2.3rem 2.2rem 1.9rem; }
+.intro-ornament { color: var(--seal); font-size: 1.6rem; }
+.intro-chapter {
+  font-variant: small-caps; letter-spacing: 0.3em; font-size: 0.78rem;
+  color: var(--ink-faint); margin: 0.5rem 0 0.6rem;
+}
+.intro-title {
+  font-variant: small-caps; letter-spacing: 0.14em; font-weight: 500;
+  font-size: 1.55rem; margin-bottom: 1rem;
+}
+.intro-text {
+  text-align: left; font-size: 1.04rem; line-height: 1.8;
+  color: var(--ink-soft); animation: intro-fade 0.5s ease;
+}
+.intro-text p { margin-bottom: 0.85rem; }
+.intro-text p:first-child::first-letter {
+  font-size: 2.9em; float: left; line-height: 0.8;
+  padding: 0.06em 0.12em 0 0; color: var(--seal); font-family: var(--serif);
+}
+.intro-text em { color: var(--ink); }
+@keyframes intro-fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.intro-dots { margin: 1.1rem 0 0.4rem; }

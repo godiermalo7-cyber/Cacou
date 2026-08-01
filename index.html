@@ -133,7 +133,8 @@
 
   <footer class="footer">
     <p>« Ce que l&rsquo;on conçoit bien s&rsquo;énonce clairement. » &mdash; Boileau, à peu près.</p>
-    <p class="footer-small">Cacou n&rsquo;expédie aucune donnée. Tout demeure dans votre navigateur, comme il se doit.</p>
+    <p class="footer-small">Cacou n&rsquo;expédie aucune donnée. Tout demeure dans votre navigateur, comme il se doit.
+      <button class="link-btn" id="footer-intro">Relire le Préambule</button></p>
   </footer>
 
   <!-- ==================== MODALE : NOUVEAU RELEVÉ ==================== -->
@@ -220,6 +221,20 @@
       <div class="modal-actions">
         <button type="button" class="btn btn-ghost" id="wizard-back">Retour</button>
         <button type="button" class="btn btn-primary" id="wizard-next">Continuer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODALE : LE PRÉAMBULE ==================== -->
+  <div class="modal-backdrop" id="modal-intro" hidden>
+    <div class="modal intro" role="dialog" aria-modal="true" aria-labelledby="intro-title">
+      <div class="intro-ornament">❦</div>
+      <div class="intro-chapter" id="intro-chapter">Chapitre I</div>
+      <h2 class="intro-title" id="intro-title">—</h2>
+      <div class="intro-text" id="intro-text"></div>
+      <div class="car-dots intro-dots" id="intro-dots"></div>
+      <div class="modal-actions" style="justify-content:center">
+        <button class="btn btn-primary" id="intro-next">Poursuivre</button>
       </div>
     </div>
   </div>

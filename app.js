@@ -1082,9 +1082,87 @@ document.querySelectorAll(".nav-link[data-view]").forEach((btn) => {
 /* fermeture des modales au clic sur le fond */
 document.querySelectorAll(".modal-backdrop").forEach((backdrop) => {
   backdrop.addEventListener("click", (e) => {
-    if (e.target === backdrop && backdrop.id !== "modal-onboard") backdrop.hidden = true;
+    if (e.target === backdrop && backdrop.id !== "modal-onboard" && backdrop.id !== "modal-intro") backdrop.hidden = true;
   });
 });
+
+/* ---------- Le Préambule (introduction narrative) ---------- */
+
+const INTRO_CHAPTERS = [
+  {
+    title: "Le Préambule",
+    html: `<p>Depuis des millénaires, l'humanité dépose ses commissions dans l'inconscience la plus totale.</p>
+      <p>Sans carte. Sans mémoire. Sans honneur. Des milliards d'événements — certains héroïques, d'autres tout à fait dispensables — engloutis dans l'oubli, comme s'ils n'avaient <em>jamais eu lieu</em>.</p>`,
+  },
+  {
+    title: "La Fondation",
+    html: `<p>En l'an de grâce MMXXVI, une poignée d'irréductibles a refusé cette amnésie universelle.</p>
+      <p>Réunis en conscience, ils ont fondé <em>le Cercle</em> : une société discrète, vouée à un art que le siècle avait perdu — celui de se souvenir. Chaque événement, consigné. Chaque lieu, cartographié. Chaque détail, documenté avec la rigueur d'un notaire et la fierté d'un explorateur.</p>`,
+  },
+  {
+    title: "Les Usages",
+    html: `<p>Au Cercle, on consigne ses événements sur la grande carte, et l'on dresse procès-verbal : échelle de Bristol, appréciation, durée, contexte, empreinte sonore.</p>
+      <p>On s'élève en grade — de <em>Novice du Trône</em> à <em>Légende Vivante</em>. On accomplit la quête du jour. On correspond par télégramme avec ses pairs. Et l'on n'en parle à personne — hormis, naturellement, à tout son réseau.</p>
+      <p>Une chose encore : vos archives ne quittent <em>jamais</em> votre appareil. Le Cercle garde ses secrets.</p>`,
+  },
+  {
+    title: "L'Invitation",
+    html: `<p>Votre heure est venue. Vous êtes convié à rejoindre les rangs du Cercle.</p>
+      <p>Mesurez la portée de ce qui vous attend : dès votre nom porté au registre, plus aucune commission ne sombrera dans l'oubli. Chacune comptera. Chacune vous élèvera.</p>
+      <p>Prenez place. Le Cercle vous observe — <em>avec bienveillance</em>.</p>`,
+  },
+];
+
+let introStep = 0;
+let introReplay = false;
+
+function renderIntroStep() {
+  const ch = INTRO_CHAPTERS[introStep];
+  $("#intro-chapter").textContent = "Chapitre " + roman(introStep + 1);
+  $("#intro-title").textContent = ch.title;
+  const txt = $("#intro-text");
+  txt.innerHTML = ch.html;
+  txt.style.animation = "none";
+  void txt.offsetWidth; /* relance l'animation de fondu */
+  txt.style.animation = "";
+  const dots = $("#intro-dots");
+  dots.innerHTML = "";
+  INTRO_CHAPTERS.forEach((_, i) => {
+    const d = el("span", "car-dot" + (i === introStep ? " is-on" : ""));
+    dots.appendChild(d);
+  });
+  const last = introStep === INTRO_CHAPTERS.length - 1;
+  $("#intro-next").textContent = last ? (introReplay ? "Refermer le Préambule" : "Rejoindre le Cercle") : "Poursuivre";
+}
+
+function showIntro(replay) {
+  introReplay = !!replay;
+  introStep = 0;
+  renderIntroStep();
+  $("#modal-intro").hidden = false;
+}
+
+$("#intro-next").addEventListener("click", () => {
+  if (introStep < INTRO_CHAPTERS.length - 1) {
+    introStep++;
+    renderIntroStep();
+    return;
+  }
+  $("#modal-intro").hidden = true;
+  const firstTime = !state.introSeen;
+  state.introSeen = true;
+  saveState();
+  if (firstTime && !introReplay) {
+    if (profileIncomplete()) openWizard();
+    else handleIncomingLinks();
+  }
+});
+
+$("#footer-intro").addEventListener("click", () => showIntro(true));
+
+function profileIncomplete() {
+  return !state.profile || !state.profile.lignee || !state.profile.skills || !state.profile.portrait;
+}
 
 /* ---------- L'Acte d'enregistrement (assistant de création) ---------- */
 
@@ -1507,8 +1585,10 @@ renderBristolLegend();
 applyTheme();
 renderAll();
 
-if (!state.profile || !state.profile.lignee || !state.profile.skills || !state.profile.portrait) {
-  /* nouvel arrivant, ou profil d'avant la grande réforme du greffe */
+if (!state.introSeen) {
+  /* toute entrée au Cercle commence par le Préambule */
+  showIntro(false);
+} else if (profileIncomplete()) {
   openWizard();
 } else {
   handleIncomingLinks();
