@@ -1138,7 +1138,9 @@ function renderIntroStep() {
     dots.appendChild(d);
   });
   const last = introStep === INTRO_CHAPTERS.length - 1;
-  $("#intro-next").textContent = last ? (introReplay ? "Refermer le Préambule" : "Rejoindre le Cercle") : "Poursuivre";
+  $("#intro-next").textContent = last
+    ? (introReplay ? "Refermer le Préambule" : (profileIncomplete() ? "Rejoindre le Cercle" : "Entrer au Cercle"))
+    : "Poursuivre";
 }
 
 function showIntro(replay) {
@@ -1148,21 +1150,26 @@ function showIntro(replay) {
   $("#modal-intro").hidden = false;
 }
 
+function closeIntro() {
+  $("#modal-intro").hidden = true;
+  state.introSeen = true;
+  saveState();
+  if (!introReplay) {
+    if (profileIncomplete()) openWizard();
+    else handleIncomingLinks();
+  }
+}
+
 $("#intro-next").addEventListener("click", () => {
   if (introStep < INTRO_CHAPTERS.length - 1) {
     introStep++;
     renderIntroStep();
     return;
   }
-  $("#modal-intro").hidden = true;
-  const firstTime = !state.introSeen;
-  state.introSeen = true;
-  saveState();
-  if (firstTime && !introReplay) {
-    if (profileIncomplete()) openWizard();
-    else handleIncomingLinks();
-  }
+  closeIntro();
 });
+
+$("#intro-skip").addEventListener("click", closeIntro);
 
 $("#footer-intro").addEventListener("click", () => showIntro(true));
 
@@ -1593,17 +1600,12 @@ renderBristolLegend();
 applyTheme();
 renderAll();
 
-if (!state.introSeen) {
-  /* toute entrée au Cercle commence par le Préambule */
-  showIntro(false);
-} else if (profileIncomplete()) {
-  openWizard();
-} else {
-  handleIncomingLinks();
-  if (state.entries.length && state.entries[0].lat) {
-    map.setView([state.entries[0].lat, state.entries[0].lng], 12);
-  }
+/* chaque ouverture commence par le Préambule, comme la cinématique d'un jeu ;
+   la carte se recentre en coulisses pendant qu'on le lit (ou qu'on le passe) */
+if (state.entries.length && state.entries[0].lat) {
+  map.setView([state.entries[0].lat, state.entries[0].lng], 12);
 }
+showIntro(false);
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js").catch(() => { /* hors ligne indisponible, tant pis */ });
