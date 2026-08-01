@@ -2,7 +2,7 @@
    Stratégie « réseau d'abord » : l'app se met à jour dès qu'elle est en ligne,
    et le cache ne sert que de secours hors connexion. */
 
-const CACHE = "cacou-v1";
+const CACHE = "cacou-v2";
 
 self.addEventListener("install", () => {
   self.skipWaiting();

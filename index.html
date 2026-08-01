@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=8">
 </head>
 <body>
 
@@ -31,6 +31,22 @@
     <div class="splash-word">CACOU</div>
     <div class="splash-sub">Le Cercle vous attend</div>
   </div>
+  <script>
+    /* fermeture autonome du rituel : fonctionne même si le reste échoue */
+    (function () {
+      var s = document.getElementById("splash");
+      var closed = false;
+      var close = function () {
+        if (closed) return;
+        closed = true;
+        s.classList.add("is-done");
+        setTimeout(function () { s.hidden = true; }, 550);
+      };
+      s.addEventListener("click", close);
+      var quick = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+      setTimeout(close, quick ? 350 : 2000);
+    })();
+  </script>
 
   <header class="masthead">
     <div class="masthead-inner">
@@ -274,6 +290,6 @@
 
   <script src="vendor/leaflet/leaflet.js"></script>
   <script src="vendor/qrcode/qrcode.js"></script>
-  <script src="app.js"></script>
+  <script src="app.js?v=8"></script>
 </body>
 </html>

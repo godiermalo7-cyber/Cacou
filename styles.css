@@ -840,3 +840,8 @@ textarea, input[type="text"] { border-radius: 12px; }
     animation-duration: 0.01s; animation-delay: 0s;
   }
 }
+
+/* filet de sécurité : même sans JavaScript, le rituel s'efface tout seul */
+#splash { animation: splash-autohide 0.5s ease forwards 2.7s; }
+#splash.is-done { animation: none; }
+@keyframes splash-autohide { to { opacity: 0; visibility: hidden; } }

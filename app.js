@@ -1587,21 +1587,7 @@ function renderAll() {
 
 $("#levelup-close").addEventListener("click", () => { $("#modal-levelup").hidden = true; });
 
-/* rituel d'ouverture : le sceau se dessine, puis s'efface */
-(function splashRitual() {
-  const splash = $("#splash");
-  if (!splash) return;
-  let closed = false;
-  const close = () => {
-    if (closed) return;
-    closed = true;
-    splash.classList.add("is-done");
-    setTimeout(() => { splash.hidden = true; }, 550);
-  };
-  splash.addEventListener("click", close);
-  const quick = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-  setTimeout(close, quick ? 350 : 2000);
-})();
+/* le rituel d'ouverture se ferme depuis index.html, de façon autonome */
 
 renderBristolLegend();
 applyTheme();
