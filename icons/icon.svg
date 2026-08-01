@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- papier -->
+  <rect width="512" height="512" fill="#f4efe4"/>
+  <!-- grain discret -->
+  <g fill="#2b2620" opacity="0.04">
+    <circle cx="80" cy="60" r="2"/><circle cx="430" cy="90" r="2"/><circle cx="120" cy="440" r="2"/>
+    <circle cx="380" cy="420" r="2"/><circle cx="250" cy="40" r="2"/><circle cx="60" cy="250" r="2"/>
+    <circle cx="460" cy="260" r="2"/><circle cx="200" cy="480" r="2"/>
+  </g>
+  <!-- double anneau du sceau -->
+  <circle cx="256" cy="256" r="206" fill="none" stroke="#2b2620" stroke-width="7"/>
+  <circle cx="256" cy="256" r="190" fill="none" stroke="#2b2620" stroke-width="3" opacity="0.4"/>
+  <!-- inscription circulaire -->
+  <defs>
+    <path id="arcTop" d="M 256,256 m -158,0 a 158,158 0 1,1 316,0"/>
+    <path id="arcBottom" d="M 256,256 m -158,0 a 158,158 0 1,0 316,0"/>
+  </defs>
+  <text font-family="Georgia, 'DejaVu Serif', serif" font-size="58" letter-spacing="26" fill="#2b2620">
+    <textPath href="#arcTop" startOffset="50%" text-anchor="middle">CACOU</textPath>
+  </text>
+  <text font-family="Georgia, 'DejaVu Serif', serif" font-size="30" letter-spacing="10" fill="#5c5344">
+    <textPath href="#arcBottom" startOffset="50%" text-anchor="middle">&#183; M M X X V I &#183;</textPath>
+  </text>
+  <!-- la pastille : le souvenir -->
+  <circle cx="256" cy="256" r="96" fill="#8b5e3c" stroke="#6e4527" stroke-width="6"/>
+  <circle cx="256" cy="256" r="34" fill="#f4efe4"/>
+  <!-- astérisques du sceau -->
+  <text x="90" y="272" font-family="Georgia, 'DejaVu Serif', serif" font-size="40" fill="#a33d2c" text-anchor="middle">&#10035;</text>
+  <text x="422" y="272" font-family="Georgia, 'DejaVu Serif', serif" font-size="40" fill="#a33d2c" text-anchor="middle">&#10035;</text>
+</svg>
