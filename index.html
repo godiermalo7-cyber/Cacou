@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cacou — Registre cartographique des commissions</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%238b5e3c'/><circle cx='50' cy='50' r='16' fill='%23f4efe4'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="masthead">
+    <div class="masthead-inner">
+      <div class="masthead-rule"></div>
+      <h1 class="wordmark">C&thinsp;A&thinsp;C&thinsp;O&thinsp;U</h1>
+      <p class="tagline">Registre cartographique des commissions &mdash; Fondé en MMXXVI</p>
+      <div class="masthead-rule"></div>
+    </div>
+  </header>
+
+  <nav class="nav">
+    <button class="nav-link is-active" data-view="carte">Carte</button>
+    <span class="nav-sep">·</span>
+    <button class="nav-link" data-view="journal">Journal</button>
+    <span class="nav-sep">·</span>
+    <button class="nav-link" data-view="cercle">Le Cercle<span class="nav-badge" id="cercle-badge" hidden></span></button>
+    <span class="nav-sep">·</span>
+    <button class="nav-link" data-view="statistiques">Statistiques</button>
+  </nav>
+
+  <main>
+    <!-- ==================== CARTE ==================== -->
+    <section class="view is-active" id="view-carte">
+      <div class="map-frame">
+        <div id="map"></div>
+        <div class="map-banner" id="map-banner" hidden>
+          Veuillez indiquer sur la carte le lieu exact de l&rsquo;événement.
+          <button class="link-btn" id="cancel-placement">Annuler</button>
+        </div>
+        <div class="map-actions">
+          <button class="btn btn-primary" id="btn-new-entry">Consigner un événement</button>
+          <button class="btn btn-ghost" id="btn-locate" title="Me situer">Me situer</button>
+        </div>
+      </div>
+      <p class="map-caption">Chaque pastille est un souvenir. Survolez, cliquez, recueillez-vous.</p>
+    </section>
+
+    <!-- ==================== JOURNAL ==================== -->
+    <section class="view" id="view-journal">
+      <div class="sheet">
+        <h2 class="sheet-title">Journal de bord</h2>
+        <p class="sheet-sub">Relevé chronologique, tenu avec la rigueur d&rsquo;un notaire.</p>
+        <div id="journal-list"></div>
+      </div>
+    </section>
+
+    <!-- ==================== CERCLE ==================== -->
+    <section class="view" id="view-cercle">
+      <div class="sheet">
+        <h2 class="sheet-title">Le Cercle</h2>
+        <p class="sheet-sub">Vos correspondants. Des personnes de confiance, tenues au secret.</p>
+        <div id="friends-list" class="friends-grid"></div>
+      </div>
+      <div class="sheet">
+        <h2 class="sheet-title">La Gazette</h2>
+        <p class="sheet-sub">Les dernières dépêches du réseau.</p>
+        <div id="feed-list"></div>
+      </div>
+    </section>
+
+    <!-- ==================== STATISTIQUES ==================== -->
+    <section class="view" id="view-statistiques">
+      <div class="sheet">
+        <h2 class="sheet-title">Statistiques générales</h2>
+        <p class="sheet-sub">La science, appliquée là où on ne l&rsquo;attendait pas.</p>
+        <div class="stat-row" id="stat-tiles"></div>
+        <h3 class="sheet-h3">Répartition selon l&rsquo;échelle de Bristol</h3>
+        <div id="bristol-chart" class="bristol-chart"></div>
+        <h3 class="sheet-h3">Décorations &amp; distinctions</h3>
+        <div id="badges-grid" class="badges-grid"></div>
+        <div class="export-row">
+          <button class="btn btn-ghost" id="btn-export">Exporter le registre (JSON)</button>
+          <button class="btn btn-ghost btn-danger" id="btn-reset">Brûler les archives</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>« Ce que l&rsquo;on conçoit bien s&rsquo;énonce clairement. » &mdash; Boileau, à peu près.</p>
+    <p class="footer-small">Cacou n&rsquo;expédie aucune donnée. Tout demeure dans votre navigateur, comme il se doit.</p>
+  </footer>
+
+  <!-- ==================== MODALE : NOUVEAU RELEVÉ ==================== -->
+  <div class="modal-backdrop" id="modal-entry" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="entry-title">
+      <div class="modal-stamp">N<sup>o</sup> <span id="entry-number">—</span></div>
+      <h2 class="modal-title" id="entry-title">Procès-verbal de commission</h2>
+      <p class="modal-place" id="entry-place">—</p>
+      <form id="entry-form">
+        <fieldset>
+          <legend>Échelle de Bristol <button type="button" class="link-btn" id="bristol-help">qu&rsquo;est-ce ?</button></legend>
+          <div class="seg" id="seg-bristol"></div>
+          <p class="seg-hint" id="bristol-hint">Choisissez le type correspondant.</p>
+        </fieldset>
+        <fieldset>
+          <legend>Appréciation générale</legend>
+          <div class="seg seg-stars" id="seg-note"></div>
+        </fieldset>
+        <fieldset>
+          <legend>Durée de la séance</legend>
+          <div class="seg" id="seg-duree"></div>
+        </fieldset>
+        <fieldset>
+          <legend>Contexte</legend>
+          <div class="seg" id="seg-contexte"></div>
+        </fieldset>
+        <fieldset>
+          <legend>Empreinte sonore</legend>
+          <div class="seg" id="seg-discretion"></div>
+        </fieldset>
+        <fieldset>
+          <legend>Observations du greffier <span class="optional">(facultatif)</span></legend>
+          <textarea id="entry-comment" rows="2" maxlength="280" placeholder="Toute remarque utile à la postérité…"></textarea>
+        </fieldset>
+        <label class="telegram-opt">
+          <input type="checkbox" id="entry-telegram" checked>
+          <span>Aviser le Cercle par télégramme</span>
+        </label>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="entry-cancel">Renoncer</button>
+          <button type="submit" class="btn btn-primary">Sceller le procès-verbal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODALE : TÉLÉGRAMME ==================== -->
+  <div class="modal-backdrop" id="modal-telegram" hidden>
+    <div class="modal telegram" role="dialog" aria-modal="true">
+      <div class="telegram-head">
+        <span>POSTES &amp; TÉLÉGRAPHES</span>
+        <span>SERVICE CACOU</span>
+      </div>
+      <div class="telegram-body" id="telegram-body"></div>
+      <div class="telegram-foot">
+        <button class="btn btn-primary" id="telegram-close">Reçu cinq sur cinq</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODALE : BRISTOL ==================== -->
+  <div class="modal-backdrop" id="modal-bristol" hidden>
+    <div class="modal" role="dialog" aria-modal="true">
+      <h2 class="modal-title">L&rsquo;échelle de Bristol</h2>
+      <p class="sheet-sub">Classification médicale tout à fait sérieuse, publiée en 1997 à Bristol, Angleterre.</p>
+      <ol class="bristol-legend" id="bristol-legend"></ol>
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="bristol-close">Fort instructif</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODALE : ONBOARDING ==================== -->
+  <div class="modal-backdrop" id="modal-onboard" hidden>
+    <div class="modal" role="dialog" aria-modal="true">
+      <h2 class="modal-title">Bienvenue au registre</h2>
+      <p class="sheet-sub">Avant toute chose, sous quel nom souhaitez-vous être inscrit&nbsp;?</p>
+      <form id="onboard-form">
+        <input type="text" id="onboard-name" maxlength="24" placeholder="Ex. : A. de Selle" autocomplete="off" required>
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary">Parapher le registre</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <script src="vendor/leaflet/leaflet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
