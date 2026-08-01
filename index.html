@@ -30,15 +30,15 @@
   </header>
 
   <nav class="nav">
-    <button class="nav-link is-active" data-view="carte">Carte</button>
+    <button class="nav-link is-active" data-view="carte"><span class="nav-glyph">⌖</span>Carte</button>
     <span class="nav-sep">·</span>
-    <button class="nav-link" data-view="journal">Journal</button>
+    <button class="nav-link" data-view="journal"><span class="nav-glyph">✎</span>Journal</button>
     <span class="nav-sep">·</span>
-    <button class="nav-link" data-view="cercle">Le Cercle<span class="nav-badge" id="cercle-badge" hidden></span></button>
+    <button class="nav-link" data-view="cercle"><span class="nav-glyph">✉</span>Cercle<span class="nav-badge" id="cercle-badge" hidden></span></button>
     <span class="nav-sep">·</span>
-    <button class="nav-link" data-view="profil">Profil</button>
+    <button class="nav-link" data-view="profil"><span class="nav-glyph">⚜</span>Profil</button>
     <span class="nav-sep">·</span>
-    <button class="nav-link" data-view="statistiques">Statistiques</button>
+    <button class="nav-link" data-view="statistiques"><span class="nav-glyph">❖</span>Stats</button>
     <span class="nav-sep">·</span>
     <button class="nav-link nav-theme" id="theme-toggle" title="Basculer entre l'édition du jour et l'édition de nuit">☾ Nuit</button>
   </nav>
@@ -58,6 +58,7 @@
         </div>
       </div>
       <p class="map-caption">Chaque pastille est un souvenir. Survolez, cliquez, recueillez-vous.</p>
+      <div class="quest-card" id="quest-card"></div>
     </section>
 
     <!-- ==================== JOURNAL ==================== -->
@@ -219,6 +220,21 @@
       <div class="modal-actions">
         <button type="button" class="btn btn-ghost" id="wizard-back">Retour</button>
         <button type="button" class="btn btn-primary" id="wizard-next">Continuer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODALE : AVANCEMENT ==================== -->
+  <div class="modal-backdrop" id="modal-levelup" hidden>
+    <div class="modal levelup" role="dialog" aria-modal="true">
+      <div class="levelup-ornament">❦</div>
+      <h2 class="modal-title">Parchemin d&rsquo;avancement</h2>
+      <div class="levelup-crest" id="levelup-crest"></div>
+      <p class="levelup-text">Par décision du Grand Greffe,<br>vous êtes élevé au rang de</p>
+      <p class="levelup-title" id="levelup-title">—</p>
+      <p class="levelup-niveau" id="levelup-niveau">—</p>
+      <div class="modal-actions" style="justify-content:center">
+        <button class="btn btn-primary" id="levelup-close">Se lever et saluer</button>
       </div>
     </div>
   </div>

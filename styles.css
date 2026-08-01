@@ -117,6 +117,15 @@ main { max-width: 880px; margin: 0 auto; padding: 0 1rem 3rem; }
   to { opacity: 1; transform: none; }
 }
 .nav-theme { color: var(--ink-faint); font-size: 0.9rem; }
+.nav-glyph { margin-right: 0.35em; font-size: 0.85em; opacity: 0.65; }
+
+/* fleuron ornemental en tête de chaque feuille */
+.sheet { position: relative; }
+.sheet::before {
+  content: "❦"; position: absolute; top: -0.75em; left: 50%;
+  transform: translateX(-50%); background: var(--paper);
+  padding: 0 0.7em; color: var(--ink-faint); font-size: 1rem;
+}
 
 /* ---------- Carte ---------- */
 
@@ -288,18 +297,74 @@ main { max-width: 880px; margin: 0 auto; padding: 0 1rem 3rem; }
 /* ---------- Acte d'enregistrement (création de personnage) ---------- */
 
 .modal-wide { max-width: 640px; }
-.choice-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.7rem; }
-.choice-card {
-  border: 1px solid var(--line); background: none; cursor: pointer;
-  padding: 0.8rem 0.95rem; text-align: left; font-family: var(--serif);
-  color: var(--ink); transition: border-color 0.15s ease;
+
+/* carrousel façon sélection de personnage */
+.carousel-box { text-align: center; }
+.carousel { display: flex; align-items: stretch; gap: 0.4rem; }
+.car-arrow {
+  flex: 0 0 2.6rem; font-size: 2rem; line-height: 1;
+  background: none; border: 1px solid var(--line); color: var(--ink-soft);
+  cursor: pointer; font-family: var(--serif); transition: all 0.15s ease;
 }
-.choice-card:hover { border-color: var(--accent); }
-.choice-card.is-on { border-color: var(--ink); outline: 1px solid var(--ink); outline-offset: 2px; }
-.choice-name { font-weight: 600; font-size: 1rem; }
-.choice-desc { font-size: 0.85rem; color: var(--ink-soft); font-style: italic; margin-top: 0.15rem; }
-.choice-trait { font-size: 0.8rem; color: var(--accent-deep); margin-top: 0.3rem; }
+.car-arrow:hover { border-color: var(--ink); color: var(--ink); }
+.car-arrow:active { transform: scale(0.94); }
+.car-stage { flex: 1; overflow: hidden; min-height: 15rem; display: flex; }
+.car-slide {
+  flex: 1; border: 1px solid var(--line); padding: 1.2rem 1.2rem 1.1rem;
+  display: flex; flex-direction: column; align-items: center; gap: 0.35rem;
+  background: rgba(255, 253, 247, 0.4);
+}
+.car-slide.slide-left { animation: slide-left 0.22s ease; }
+.car-slide.slide-right { animation: slide-right 0.22s ease; }
+@keyframes slide-left { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
+@keyframes slide-right { from { opacity: 0; transform: translateX(-24px); } to { opacity: 1; transform: none; } }
+.car-emblem { color: var(--accent-deep); }
+.car-emblem svg { width: 84px; height: 84px; }
+.car-dots { display: flex; justify-content: center; gap: 0.45rem; margin-top: 0.7rem; }
+.car-dot {
+  width: 0.5rem; height: 0.5rem; border-radius: 50%;
+  border: 1px solid var(--ink-faint); display: inline-block;
+}
+.car-dot.is-on { background: var(--ink); border-color: var(--ink); }
+.choice-name { font-weight: 600; font-size: 1.15rem; }
+.choice-desc { font-size: 0.88rem; color: var(--ink-soft); font-style: italic; }
+.choice-trait { font-size: 0.82rem; color: var(--accent-deep); margin-top: 0.25rem; }
 .choice-trait::before { content: "✳ "; color: var(--seal); }
+
+/* compétences : auto-évaluation par pips */
+.skill-row {
+  display: flex; align-items: baseline; gap: 0.8rem;
+  padding: 0.55rem 0; border-bottom: 1px dotted var(--line); flex-wrap: wrap;
+}
+.skill-row:last-child { border-bottom: none; }
+.skill-label { flex: 1 1 10rem; }
+.skill-name { font-weight: 600; }
+.skill-desc { font-size: 0.8rem; color: var(--ink-faint); font-style: italic; }
+.pip-picker { display: flex; gap: 0.3rem; }
+.pip-btn {
+  width: 1.5rem; height: 1.5rem; font-size: 1rem; line-height: 1;
+  background: none; border: none; cursor: pointer; color: var(--ink-faint);
+  font-family: var(--serif); padding: 0;
+}
+.pip-btn.is-on { color: var(--accent-deep); }
+.pips { letter-spacing: 0.18em; color: var(--accent-deep); white-space: nowrap; }
+.pips .pip-off { color: var(--ink-faint); opacity: 0.5; }
+.pip-bonus { font-size: 0.78rem; color: var(--seal); margin-left: 0.4rem; }
+
+/* atelier d'effigie */
+.effigie-shop { display: flex; gap: 1.4rem; flex-wrap: wrap; align-items: flex-start; }
+.effigie-preview { flex: 0 0 auto; width: 148px; color: var(--ink); }
+.effigie-preview svg { width: 148px; height: 148px; }
+.effigie-rows { flex: 1; min-width: 230px; }
+.opt-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.55rem; }
+.opt-kind { flex: 0 0 6.2rem; font-variant: small-caps; letter-spacing: 0.08em; font-size: 0.78rem; color: var(--ink-faint); }
+.opt-arrow {
+  width: 1.9rem; height: 1.9rem; line-height: 1; font-size: 1.2rem;
+  background: none; border: 1px solid var(--line); color: var(--ink-soft);
+  cursor: pointer; font-family: var(--serif);
+}
+.opt-arrow:hover { border-color: var(--ink); color: var(--ink); }
+.opt-value { flex: 1; text-align: center; font-size: 0.92rem; }
 
 .blason-workshop { display: flex; gap: 1.4rem; flex-wrap: wrap; align-items: flex-start; }
 .blason-preview { flex: 0 0 auto; width: 132px; }
@@ -347,6 +412,36 @@ main { max-width: 880px; margin: 0 auto; padding: 0 1rem 3rem; }
 .visite-crest svg { width: 46px; height: 46px; display: block; }
 .friend-crest { float: right; margin-left: 0.5rem; }
 .friend-crest svg { width: 36px; height: 36px; display: block; }
+
+/* ---------- Quête du jour ---------- */
+
+.quest-card {
+  max-width: 560px; margin: 1.1rem auto 0;
+  border: 1px solid var(--line); border-left: 3px solid var(--seal);
+  padding: 0.75rem 1rem; background: rgba(255, 253, 247, 0.5);
+  display: flex; gap: 0.8rem; align-items: baseline;
+}
+.quest-glyph { color: var(--seal); font-size: 1.1rem; }
+.quest-name { font-weight: 600; font-variant: small-caps; letter-spacing: 0.06em; }
+.quest-desc { font-size: 0.88rem; color: var(--ink-soft); font-style: italic; }
+.quest-xp { font-size: 0.8rem; color: var(--accent-deep); white-space: nowrap; }
+.quest-card.is-done { border-left-color: var(--accent); opacity: 0.75; }
+.quest-card.is-done .quest-glyph { color: var(--accent); }
+
+/* ---------- Parchemin d'avancement ---------- */
+
+.modal.levelup { max-width: 420px; text-align: center; }
+.levelup-ornament { color: var(--seal); font-size: 1.6rem; margin-bottom: 0.2rem; }
+.levelup-crest { margin: 0.8rem auto 0.4rem; width: 110px; color: var(--ink); }
+.levelup-crest svg { width: 110px; height: 110px; }
+.levelup-text { font-style: italic; color: var(--ink-soft); margin-top: 0.4rem; }
+.levelup-title {
+  font-variant: small-caps; letter-spacing: 0.14em; font-size: 1.45rem;
+  font-weight: 600; color: var(--accent-deep); margin-top: 0.3rem;
+  animation: levelup-in 0.5s ease;
+}
+@keyframes levelup-in { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: none; } }
+.levelup-niveau { font-size: 0.85rem; color: var(--ink-faint); }
 
 /* ---------- Séparateur de mois (journal) ---------- */
 

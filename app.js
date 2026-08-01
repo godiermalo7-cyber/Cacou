@@ -102,6 +102,146 @@ const NIVEAUX = [
   { xp: 1900, titre: "Légende Vivante du Trône" },
 ];
 
+/* ---------- Emblèmes gravés (un par lignée, vocation, guilde) ---------- */
+
+const EMBLEMES = {
+  colon:      '<path d="M3 40 L17 14 L25 28 L31 18 L45 40 Z"/><path d="M13 22 l4 -4 l4 5"/><circle cx="38" cy="10" r="1"/><circle cx="9" cy="9" r="1"/><circle cx="24" cy="6" r="1"/>',
+  elfe:       '<path d="M24 42 V26"/><path d="M24 26 C10 26 10 8 24 8 C38 8 38 26 24 26 Z"/><path d="M24 34 l-6 -6"/><path d="M24 30 l5 -5"/><path d="M18 42 h12"/>',
+  nain:       '<path d="M12 42 V14 h4 v-4 h4 v4 h8 v-4 h4 v4 h4 v28"/><path d="M10 42 h28"/><path d="M20 42 v-10 h8 v10"/>',
+  gobelin:    '<path d="M16 40 C18 24 30 10 42 6 C38 20 28 34 20 38 Z"/><path d="M16 40 l-6 4"/><path d="M24 30 C28 24 32 18 36 14"/>',
+  ondin:      '<path d="M4 16 q6 -8 12 0 t12 0 t12 0"/><path d="M4 27 q6 -8 12 0 t12 0 t12 0"/><path d="M4 38 q6 -8 12 0 t12 0 t12 0"/>',
+  chevalier:  '<path d="M24 5 l13 4 v12 c0 10 -7 17 -13 21 c-6 -4 -13 -11 -13 -21 v-12 Z"/><path d="M24 13 v18"/><path d="M17 20 h14"/>',
+  alchimiste: '<path d="M20 5 h8"/><path d="M22 5 v10 L12 36 a4 4 0 0 0 4 6 h16 a4 4 0 0 0 4 -6 L26 15 V5"/><path d="M17 31 h14"/><circle cx="22" cy="36" r="1"/><circle cx="27" cy="34" r="1"/>',
+  barde:      '<path d="M14 7 c-2 10 0 20 10 24 c10 -4 12 -14 10 -24"/><path d="M20 11 v16"/><path d="M24 12 v16"/><path d="M28 11 v16"/><path d="M18 41 h12"/><path d="M24 31 v10"/>',
+  moine:      '<path d="M24 5 a2 2 0 0 1 2 2 c8 2 8 12 8 18 l4 6 H10 l4 -6 c0 -6 0 -16 8 -18 a2 2 0 0 1 2 -2 Z"/><path d="M20 37 a4 4 0 0 0 8 0"/>',
+  rodeur:     '<circle cx="24" cy="24" r="16"/><path d="M24 8 v4 M24 36 v4 M8 24 h4 M36 24 h4"/><path d="M30 18 L26 26 L18 30 L22 22 Z"/>',
+  aube:       '<path d="M6 33 h36"/><path d="M14 33 a10 10 0 0 1 20 0"/><path d="M24 16 v-6 M12 20 l-4 -4 M36 20 l4 -4"/>',
+  zenith:     '<circle cx="24" cy="24" r="9"/><path d="M24 6 v6 M24 36 v6 M6 24 h6 M36 24 h6 M11 11 l4 4 M33 33 l4 4 M37 11 l-4 4 M15 33 l-4 4"/>',
+  crepuscule: '<path d="M6 30 h36"/><path d="M14 30 a10 10 0 0 1 20 0"/><path d="M10 36 h8 M22 36 h8 M34 36 h5"/><path d="M16 42 h10"/>',
+  minuit:     '<path d="M28 7 a14 14 0 1 0 12 20 a11 11 0 0 1 -12 -20 Z"/><path d="M12 9 v6 M9 12 h6"/><path d="M39 33 v5 M36.5 35.5 h5"/>',
+};
+
+function emblemSvg(id, size) {
+  const inner = EMBLEMES[id] || "";
+  return `<svg viewBox="0 0 48 48"${size ? ` width="${size}" height="${size}"` : ""} aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${inner}</g></svg>`;
+}
+
+/* ---------- Effigie (portrait personnalisable) ---------- */
+
+const COIFFES = [
+  { id: "nu",       name: "Tête nue",        svg: '<path d="M36 30 a14 14 0 0 1 28 0" />' },
+  { id: "hautform", name: "Haut-de-forme",   svg: '<rect x="37" y="6" width="26" height="20"/><path d="M29 26 h42"/><path d="M37 20 h26"/>' },
+  { id: "capuche",  name: "Capuche",         svg: '<path d="M33 42 C29 14 50 5 50 5 C50 5 71 14 67 42"/><path d="M33 42 q17 6 34 0"/>' },
+  { id: "heaume",   name: "Heaume",          svg: '<path d="M36 46 v-14 a14 14 0 0 1 28 0 v14"/><path d="M36 37 h28"/><path d="M50 32 v14"/>' },
+  { id: "couronne", name: "Couronne",        svg: '<path d="M35 29 L38 15 L44 22 L50 12 L56 22 L62 15 L65 29 Z"/>' },
+  { id: "beret",    name: "Béret à plume",   svg: '<path d="M34 28 q16 -14 32 0"/><path d="M60 22 q8 -10 13 -13"/><circle cx="50" cy="17" r="1.5"/>' },
+];
+
+const VISAGES = [
+  { id: "glabre",    name: "Visage glabre",  svg: "" },
+  { id: "moustache", name: "Moustache cirée", svg: '<path d="M42 52 q8 6 16 0"/><path d="M41 52 q-3 2 -5 0"/><path d="M59 52 q3 2 5 0"/>' },
+  { id: "barbe",     name: "Barbe de sage",  svg: '<path d="M39 48 q0 17 11 17 q11 0 11 -17"/><path d="M44 52 q6 4 12 0"/>' },
+  { id: "monocle",   name: "Monocle",        svg: '<circle cx="57" cy="43" r="5"/><path d="M57 48 v9"/>' },
+  { id: "lunettes",  name: "Bésicles",       svg: '<circle cx="43" cy="43" r="5"/><circle cx="57" cy="43" r="5"/><path d="M48 43 h4"/><path d="M38 43 h-4 M62 43 h4"/>' },
+];
+
+function portraitSvg(coiffe, visage, color) {
+  const c = COIFFES.find((x) => x.id === coiffe) || COIFFES[0];
+  const v = VISAGES.find((x) => x.id === visage) || VISAGES[0];
+  const col = esc(color || "#2b2620");
+  return `<svg viewBox="0 0 100 100" aria-hidden="true">
+    <circle cx="50" cy="50" r="47" fill="#fffdf7" stroke="${col}" stroke-width="2.5"/>
+    <circle cx="50" cy="50" r="41" fill="none" stroke="${col}" stroke-width="1" opacity="0.4"/>
+    <g fill="none" stroke="${col}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 88 c3 -15 13 -20 28 -20 s25 5 28 20"/>
+      <circle cx="50" cy="42" r="15"/>
+      <circle cx="44.5" cy="42" r="0.8" fill="${col}"/>
+      <circle cx="55.5" cy="42" r="0.8" fill="${col}"/>
+      ${c.svg}${v.svg}
+    </g>
+  </svg>`;
+}
+
+function profilePortraitSvg() {
+  const p = state.profile || {};
+  const port = p.portrait || {};
+  const color = (p.blason && p.blason.c) || "#2b2620";
+  return portraitSvg(port.coiffe, port.visage, color);
+}
+
+/* ---------- Compétences clés ---------- */
+
+const SKILLS = [
+  { id: "regularite",   name: "Régularité",   desc: "La constance du métronome suisse." },
+  { id: "discretion",   name: "Discrétion",   desc: "L'art de passer inaperçu, même en pleine action." },
+  { id: "endurance",    name: "Endurance",    desc: "Tenir le siège, sans faiblir ni se plaindre." },
+  { id: "cartographie", name: "Cartographie", desc: "Conquérir sans relâche de nouveaux territoires." },
+  { id: "eloquence",    name: "Éloquence",    desc: "L'art du télégramme bien troussé." },
+];
+
+function skillBonus(id) {
+  const e = state.entries;
+  let b = 0;
+  if (id === "regularite") b = Math.floor(e.length / 5);
+  if (id === "discretion") b = Math.floor(e.filter((x) => x.discretion === "silencieux").length / 3);
+  if (id === "endurance") b = Math.floor(e.filter((x) => x.duree === "contemplative" || x.duree === "sabbatique").length / 3);
+  if (id === "cartographie") b = Math.floor(new Set(e.map((x) => x.place).filter(Boolean)).size / 3);
+  if (id === "eloquence") b = Math.floor((state.telegramCount || 0) / 4);
+  return b;
+}
+
+function effectiveSkill(id) {
+  const base = (state.profile && state.profile.skills && state.profile.skills[id]) || 1;
+  return { base, bonus: skillBonus(id), total: Math.min(10, base + skillBonus(id)) };
+}
+
+function pips(total, max) {
+  let s = "";
+  for (let i = 0; i < max; i++) s += i < total ? "◆" : '<span class="pip-off">◇</span>';
+  return s;
+}
+
+/* ---------- Quête du jour ---------- */
+
+const QUESTS = [
+  { id: "aurore",       name: "L'Heure du Coq",      desc: "Consigner un événement avant neuf heures.", xp: 15, test: (e) => new Date(e.date).getHours() < 9 },
+  { id: "ideal",        name: "La Quête de l'Idéal", desc: "Obtenir un Type IV, l'idéal du genre.", xp: 15, test: (e) => e.bristol === 4 },
+  { id: "fantome",      name: "Le Fantôme",          desc: "Une empreinte sonore de silence monacal.", xp: 15, test: (e) => e.discretion === "silencieux" },
+  { id: "chroniqueur",  name: "Le Chroniqueur",      desc: "Joindre une observation au procès-verbal.", xp: 10, test: (e) => !!e.comment },
+  { id: "grandchemin",  name: "Le Grand Chemin",     desc: "Officier hors du domicile.", xp: 15, test: (e) => e.contexte !== "domicile" },
+  { id: "grace",        name: "L'Instant de Grâce",  desc: "Vivre une séance cinq étoiles.", xp: 10, test: (e) => e.note === 5 },
+  { id: "veille",       name: "La Longue Veille",    desc: "Une séance contemplative, ou mieux : sabbatique.", xp: 15, test: (e) => e.duree === "contemplative" || e.duree === "sabbatique" },
+];
+
+function todayQuest() {
+  const now = new Date();
+  const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
+  return QUESTS[dayOfYear % QUESTS.length];
+}
+
+function renderQuest() {
+  const box = $("#quest-card");
+  if (!box) return;
+  const q = todayQuest();
+  const done = state.questDoneOn === new Date().toDateString();
+  box.className = "quest-card" + (done ? " is-done" : "");
+  box.innerHTML = `
+    <span class="quest-glyph">${done ? "✓" : "❖"}</span>
+    <span><span class="quest-name">Quête du jour — ${esc(q.name)}</span><br>
+    <span class="quest-desc">${done ? "Quête accomplie. Le Grand Greffe est satisfait." : esc(q.desc)}</span></span>
+    <span class="quest-xp">+${q.xp} XP</span>`;
+}
+
+function checkQuest(entry) {
+  const q = todayQuest();
+  if (state.questDoneOn === new Date().toDateString()) return;
+  if (q.test(entry)) {
+    state.questDoneOn = new Date().toDateString();
+    addXp(q.xp);
+    setTimeout(() => toast(`QUÊTE ACCOMPLIE — ${q.name} (+${q.xp} XP). Le Grand Greffe est satisfait.`), 400);
+  }
+}
+
 /* ---------- Le Cercle (correspondants de démonstration) ---------- */
 
 const FRIENDS = [
@@ -216,7 +356,12 @@ function addXp(amount) {
   state.xp = (state.xp || 0) + amount;
   const after = levelInfo(state.xp);
   if (after.niveau > before) {
-    setTimeout(() => toast(`AVANCEMENT — Vous voilà ${after.titre} (niveau ${after.niveau}). Le Cercle s'incline.`), 900);
+    setTimeout(() => {
+      $("#levelup-crest").innerHTML = profilePortraitSvg();
+      $("#levelup-title").textContent = after.titre;
+      $("#levelup-niveau").textContent = `Niveau ${after.niveau} — ${state.xp} points d'expérience`;
+      $("#modal-levelup").hidden = false;
+    }, 1000);
   }
 }
 
@@ -455,6 +600,7 @@ $("#entry-form").addEventListener("submit", (e) => {
   const after = earnedBadgeIds();
   const fresh = after.filter((id) => !before.includes(id));
   addXp(10 + (sendTelegram ? 5 : 0) + fresh.length * 25);
+  checkQuest(entry);
 
   saveState();
   renderAll();
@@ -500,9 +646,11 @@ function telegramShareLink(text) {
 
 function cardShareLink() {
   const b = state.profile.blason;
+  const p = state.profile.portrait;
   return appUrl() + "?ami=" + encodeCode({
     v: 1, id: state.profile.id, name: state.profile.name,
     t: currentTitle(), b: b ? [b.s, b.c] : undefined,
+    p: p ? [p.coiffe, p.visage] : undefined,
   });
 }
 
@@ -627,9 +775,10 @@ function renderRealFriends() {
   }
   state.realFriends.forEach((f) => {
     const card = el("div", "friend-card is-real");
-    if (f.blason) {
-      const crest = el("div", "friend-crest", crestSvg(f.blason[0], f.blason[1]));
-      card.appendChild(crest);
+    if (f.portrait) {
+      card.appendChild(el("div", "friend-crest", portraitSvg(f.portrait[0], f.portrait[1], f.blason ? f.blason[1] : null)));
+    } else if (f.blason) {
+      card.appendChild(el("div", "friend-crest", crestSvg(f.blason[0], f.blason[1])));
     }
     card.appendChild(el("div", "friend-seal", "Correspondant certifié"));
     card.appendChild(el("div", "friend-name", esc(f.name)));
@@ -683,6 +832,7 @@ function addFriendFromCode(raw) {
     name: String(data.name).slice(0, 24),
     titre: data.t ? String(data.t).slice(0, 40) : null,
     blason: Array.isArray(data.b) && data.b.length === 2 ? [String(data.b[0]).slice(0, 4), String(data.b[1]).slice(0, 12)] : null,
+    portrait: Array.isArray(data.p) && data.p.length === 2 ? [String(data.p[0]).slice(0, 12), String(data.p[1]).slice(0, 12)] : null,
     addedAt: new Date().toISOString(),
   });
   saveState();
@@ -693,7 +843,7 @@ function addFriendFromCode(raw) {
 function renderVisite() {
   if (!state.profile) return;
   $("#visite-name").innerHTML =
-    `<span class="visite-crest">${profileCrestSvg()}</span>` +
+    `<span class="visite-crest">${profilePortraitSvg()}</span>` +
     `<span>${esc(state.profile.name)}<br><span class="profil-titre">${esc(currentTitle())}</span></span>`;
   const link = cardShareLink();
   const qrBox = $("#qr-box");
@@ -938,32 +1088,62 @@ document.querySelectorAll(".modal-backdrop").forEach((backdrop) => {
 
 /* ---------- L'Acte d'enregistrement (assistant de création) ---------- */
 
-const wizard = { step: 0, name: "", lignee: null, vocation: null, guilde: null, symbol: null, color: null };
+const wizard = {
+  step: 0, name: "", lignee: null, vocation: null, guilde: null,
+  symbol: null, color: null, coiffe: null, visage: null, skills: null,
+};
 
 const WIZARD_STEPS = [
   { title: "Acte d'enregistrement", sub: "Avant toute chose, sous quel nom la postérité doit-elle vous connaître ?" },
-  { title: "Votre lignée", sub: "On ne choisit pas ses entrailles ; on choisit d'en être fier." },
+  { title: "Votre lignée", sub: "Faites défiler les maisons. On ne choisit pas ses entrailles ; on choisit d'en être fier." },
   { title: "Votre vocation", sub: "Tout personnage a une classe. La vôtre ne fait pas exception." },
   { title: "Votre guilde", sub: "Dites-moi à quelle heure vous officiez, je vous dirai qui vous êtes." },
-  { title: "Votre blason", sub: "Les armes de votre maison, apposées sur chaque acte." },
+  { title: "Vos compétences", sub: "Évaluez-vous avec honnêteté. L'expérience fera le reste." },
+  { title: "Votre effigie", sub: "Le portrait officiel qui ornera vos actes et votre correspondance." },
 ];
 
-function choiceCards(items, selectedId, onPick, withTrait) {
-  const grid = el("div", "choice-grid");
-  items.forEach((item) => {
-    const card = el("button", "choice-card" + (selectedId === item.id ? " is-on" : ""));
-    card.type = "button";
-    card.appendChild(el("div", "choice-name", esc(item.name)));
-    card.appendChild(el("div", "choice-desc", esc(item.desc)));
-    if (withTrait && item.trait) card.appendChild(el("div", "choice-trait", esc(item.trait)));
-    card.addEventListener("click", () => {
-      onPick(item.id);
-      [...grid.children].forEach((c) => c.classList.remove("is-on"));
-      card.classList.add("is-on");
-    });
-    grid.appendChild(card);
-  });
-  return grid;
+/* carrousel façon écran de sélection de personnage : flèches, points, glissement */
+function carousel(items, startId, renderSlide, onChange) {
+  let idx = Math.max(0, items.findIndex((i) => i.id === startId));
+  const box = el("div", "carousel-box");
+  const row = el("div", "carousel");
+  const prev = el("button", "car-arrow", "‹"); prev.type = "button"; prev.setAttribute("aria-label", "Précédent");
+  const next = el("button", "car-arrow", "›"); next.type = "button"; next.setAttribute("aria-label", "Suivant");
+  const stage = el("div", "car-stage");
+  const dots = el("div", "car-dots");
+  items.forEach(() => dots.appendChild(el("span", "car-dot")));
+  function update(dir) {
+    stage.innerHTML = "";
+    const slide = renderSlide(items[idx]);
+    if (dir > 0) slide.classList.add("slide-left");
+    if (dir < 0) slide.classList.add("slide-right");
+    stage.appendChild(slide);
+    [...dots.children].forEach((d, i) => d.classList.toggle("is-on", i === idx));
+    onChange(items[idx].id);
+  }
+  prev.addEventListener("click", () => { idx = (idx - 1 + items.length) % items.length; update(-1); });
+  next.addEventListener("click", () => { idx = (idx + 1) % items.length; update(1); });
+  let x0 = null;
+  stage.addEventListener("touchstart", (e) => { x0 = e.touches[0].clientX; }, { passive: true });
+  stage.addEventListener("touchend", (e) => {
+    if (x0 === null) return;
+    const dx = e.changedTouches[0].clientX - x0;
+    if (dx > 40) prev.click(); else if (dx < -40) next.click();
+    x0 = null;
+  }, { passive: true });
+  row.appendChild(prev); row.appendChild(stage); row.appendChild(next);
+  box.appendChild(row); box.appendChild(dots);
+  update(0);
+  return box;
+}
+
+function characterSlide(item, withTrait) {
+  const slide = el("div", "car-slide");
+  slide.appendChild(el("div", "car-emblem", emblemSvg(item.id)));
+  slide.appendChild(el("div", "choice-name", esc(item.name)));
+  slide.appendChild(el("div", "choice-desc", esc(item.desc)));
+  if (withTrait && item.trait) slide.appendChild(el("div", "choice-trait", esc(item.trait)));
+  return slide;
 }
 
 function renderWizardStep() {
@@ -986,20 +1166,80 @@ function renderWizardStep() {
     body.appendChild(input);
     setTimeout(() => input.focus(), 50);
   } else if (wizard.step === 1) {
-    body.appendChild(choiceCards(LIGNEES, wizard.lignee, (id) => { wizard.lignee = id; }, true));
+    body.appendChild(carousel(LIGNEES, wizard.lignee || LIGNEES[0].id, (i) => characterSlide(i, true), (id) => { wizard.lignee = id; }));
   } else if (wizard.step === 2) {
-    body.appendChild(choiceCards(VOCATIONS, wizard.vocation, (id) => { wizard.vocation = id; }));
+    body.appendChild(carousel(VOCATIONS, wizard.vocation || VOCATIONS[0].id, (i) => characterSlide(i), (id) => { wizard.vocation = id; }));
   } else if (wizard.step === 3) {
-    body.appendChild(choiceCards(GUILDES, wizard.guilde, (id) => { wizard.guilde = id; }));
+    body.appendChild(carousel(GUILDES, wizard.guilde || GUILDES[0].id, (i) => characterSlide(i), (id) => { wizard.guilde = id; }));
+  } else if (wizard.step === 4) {
+    if (!wizard.skills) {
+      wizard.skills = {};
+      SKILLS.forEach((s) => { wizard.skills[s.id] = 2; });
+    }
+    SKILLS.forEach((s) => {
+      const row = el("div", "skill-row");
+      const label = el("div", "skill-label");
+      label.appendChild(el("div", "skill-name", esc(s.name)));
+      label.appendChild(el("div", "skill-desc", esc(s.desc)));
+      row.appendChild(label);
+      const picker = el("div", "pip-picker");
+      const refresh = () => {
+        [...picker.children].forEach((b, i) => {
+          b.textContent = i < wizard.skills[s.id] ? "◆" : "◇";
+          b.classList.toggle("is-on", i < wizard.skills[s.id]);
+        });
+      };
+      for (let i = 1; i <= 5; i++) {
+        const b = el("button", "pip-btn");
+        b.type = "button"; b.setAttribute("aria-label", `${s.name} : ${i} sur 5`);
+        b.addEventListener("click", () => { wizard.skills[s.id] = i; refresh(); });
+        picker.appendChild(b);
+      }
+      refresh();
+      row.appendChild(picker);
+      body.appendChild(row);
+    });
   } else {
     if (!wizard.symbol) wizard.symbol = BLASON_SYMBOLS[0];
     if (!wizard.color) wizard.color = BLASON_COLORS[0].hex;
-    const shop = el("div", "blason-workshop");
-    const preview = el("div", "blason-preview");
-    const refreshPreview = () => { preview.innerHTML = crestSvg(wizard.symbol, wizard.color); };
-    refreshPreview();
-    const choices = el("div", "blason-choices");
+    if (!wizard.coiffe) wizard.coiffe = COIFFES[0].id;
+    if (!wizard.visage) wizard.visage = VISAGES[0].id;
+
+    const shop = el("div", "effigie-shop");
+    const preview = el("div", "effigie-preview");
+    const refreshPreview = () => { preview.innerHTML = portraitSvg(wizard.coiffe, wizard.visage, wizard.color); };
+    const rows = el("div", "effigie-rows");
+
+    const cycleRow = (kind, options, get, set) => {
+      const row = el("div", "opt-row");
+      row.appendChild(el("span", "opt-kind", kind));
+      const left = el("button", "opt-arrow", "‹"); left.type = "button";
+      const value = el("span", "opt-value");
+      const right = el("button", "opt-arrow", "›"); right.type = "button";
+      const refresh = () => {
+        const cur = options.find((o) => o.id === get());
+        value.textContent = cur ? cur.name : "—";
+        refreshPreview();
+      };
+      const move = (d) => {
+        const i = options.findIndex((o) => o.id === get());
+        set(options[(i + d + options.length) % options.length].id);
+        refresh();
+      };
+      left.addEventListener("click", () => move(-1));
+      right.addEventListener("click", () => move(1));
+      row.appendChild(left); row.appendChild(value); row.appendChild(right);
+      refresh();
+      return row;
+    };
+
+    rows.appendChild(cycleRow("Couvre-chef", COIFFES, () => wizard.coiffe, (v) => { wizard.coiffe = v; }));
+    rows.appendChild(cycleRow("Visage", VISAGES, () => wizard.visage, (v) => { wizard.visage = v; }));
+
+    const symRow = el("div", "opt-row");
+    symRow.appendChild(el("span", "opt-kind", "Sceau"));
     const symGrid = el("div", "symbol-grid");
+    symGrid.style.marginBottom = "0";
     BLASON_SYMBOLS.forEach((s) => {
       const b = el("button", "symbol-btn" + (wizard.symbol === s ? " is-on" : ""), esc(s) + "︎");
       b.type = "button";
@@ -1007,11 +1247,16 @@ function renderWizardStep() {
         wizard.symbol = s;
         [...symGrid.children].forEach((c) => c.classList.remove("is-on"));
         b.classList.add("is-on");
-        refreshPreview();
       });
       symGrid.appendChild(b);
     });
+    symRow.appendChild(symGrid);
+    rows.appendChild(symRow);
+
+    const colRow = el("div", "opt-row");
+    colRow.appendChild(el("span", "opt-kind", "Encre"));
     const colGrid = el("div", "color-grid");
+    colGrid.style.marginBottom = "0";
     BLASON_COLORS.forEach((c) => {
       const b = el("button", "color-btn" + (wizard.color === c.hex ? " is-on" : ""));
       b.type = "button"; b.title = c.name; b.style.background = c.hex;
@@ -1023,15 +1268,18 @@ function renderWizardStep() {
       });
       colGrid.appendChild(b);
     });
-    choices.appendChild(symGrid);
-    choices.appendChild(colGrid);
+    colRow.appendChild(colGrid);
+    rows.appendChild(colRow);
+
     const lig = LIGNEES.find((x) => x.id === wizard.lignee);
     const voc = VOCATIONS.find((x) => x.id === wizard.vocation);
     const gui = GUILDES.find((x) => x.id === wizard.guilde);
-    choices.appendChild(el("p", "wizard-summary",
+    rows.appendChild(el("p", "wizard-summary",
       `${esc(wizard.name || "?")}, ${esc(lig ? lig.name : "?")}, ${esc(voc ? voc.name : "?")}, membre de ${esc(gui ? gui.name : "?")}.`));
+
+    refreshPreview();
     shop.appendChild(preview);
-    shop.appendChild(choices);
+    shop.appendChild(rows);
     body.appendChild(shop);
   }
 }
@@ -1043,6 +1291,8 @@ function openWizard() {
     wizard.vocation = state.profile.vocation || null;
     wizard.guilde = state.profile.guilde || null;
     if (state.profile.blason) { wizard.symbol = state.profile.blason.s; wizard.color = state.profile.blason.c; }
+    if (state.profile.portrait) { wizard.coiffe = state.profile.portrait.coiffe; wizard.visage = state.profile.portrait.visage; }
+    if (state.profile.skills) wizard.skills = Object.assign({}, state.profile.skills);
   }
   wizard.step = 0;
   renderWizardStep();
@@ -1055,9 +1305,6 @@ $("#wizard-back").addEventListener("click", () => {
 
 $("#wizard-next").addEventListener("click", () => {
   if (wizard.step === 0 && !wizard.name.trim()) return toast("Un nom, je vous prie. L'anonymat n'a pas cours ici.");
-  if (wizard.step === 1 && !wizard.lignee) return toast("Toute personne descend de quelque part. Choisissez.");
-  if (wizard.step === 2 && !wizard.vocation) return toast("Sans vocation, point de salut. Choisissez.");
-  if (wizard.step === 3 && !wizard.guilde) return toast("Une guilde vous attend quelque part. Choisissez.");
   if (wizard.step < WIZARD_STEPS.length - 1) {
     wizard.step++;
     renderWizardStep();
@@ -1072,6 +1319,8 @@ $("#wizard-next").addEventListener("click", () => {
     vocation: wizard.vocation,
     guilde: wizard.guilde,
     blason: { s: wizard.symbol, c: wizard.color },
+    portrait: { coiffe: wizard.coiffe, visage: wizard.visage },
+    skills: Object.assign({}, wizard.skills),
   };
   saveState();
   $("#modal-onboard").hidden = true;
@@ -1103,7 +1352,7 @@ function renderProfil() {
   const info = levelInfo(state.xp || 0);
 
   const head = el("div", "profil-head");
-  head.appendChild(el("div", "profil-crest", profileCrestSvg()));
+  head.appendChild(el("div", "profil-crest", profilePortraitSvg()));
   const idBlock = el("div");
   idBlock.appendChild(el("div", "profil-name", esc(p.name)));
   idBlock.appendChild(el("div", "profil-titre", esc(info.titre)));
@@ -1131,7 +1380,13 @@ function renderProfil() {
   const gui = GUILDES.find((x) => x.id === p.guilde);
   [["Lignée", lig, true], ["Vocation", voc, false], ["Guilde", gui, false]].forEach(([kind, item, withTrait]) => {
     const card = el("div", "attr-card");
-    card.appendChild(el("div", "attr-kind", kind));
+    if (item) {
+      const kindRow = el("div", "attr-kind",
+        `<span style="float:right;color:var(--accent-deep)">${emblemSvg(item.id, 26)}</span>${kind}`);
+      card.appendChild(kindRow);
+    } else {
+      card.appendChild(el("div", "attr-kind", kind));
+    }
     card.appendChild(el("div", "attr-name", esc(item ? item.name : "Non renseigné")));
     if (item) card.appendChild(el("div", "attr-desc", esc(item.desc)));
     if (withTrait && item && item.trait) card.appendChild(el("div", "attr-trait", esc(item.trait)));
@@ -1143,6 +1398,24 @@ function renderProfil() {
   feats.appendChild(el("div", "attr-desc", `${state.entries.length} événement${state.entries.length > 1 ? "s" : ""} consignés, ${state.realFriends.length} correspondant${state.realFriends.length > 1 ? "s" : ""} certifiés.`));
   attrs.appendChild(feats);
   box.appendChild(attrs);
+
+  /* compétences : auto-évaluation + acquis de l'expérience */
+  box.appendChild(el("h3", "sheet-h3", "Compétences clés"));
+  const skillsBox = el("div");
+  SKILLS.forEach((s) => {
+    const eff = effectiveSkill(s.id);
+    const row = el("div", "skill-row");
+    const label = el("div", "skill-label");
+    label.appendChild(el("div", "skill-name", esc(s.name)));
+    label.appendChild(el("div", "skill-desc",
+      `Auto-évaluation : ${eff.base}/5${eff.bonus ? ` — acquis sur le terrain : +${eff.bonus}` : ""}`));
+    row.appendChild(label);
+    const pipsEl = el("div", "pips", pips(eff.total, 10));
+    if (eff.bonus) pipsEl.appendChild(el("span", "pip-bonus", `+${eff.bonus}`));
+    row.appendChild(pipsEl);
+    skillsBox.appendChild(row);
+  });
+  box.appendChild(skillsBox);
 
   const actions = el("div", "profil-actions");
   const editBtn = el("button", "btn btn-ghost", "Modifier l'acte");
@@ -1225,14 +1498,17 @@ function renderAll() {
   renderStats();
   renderBadges();
   renderProfil();
+  renderQuest();
 }
+
+$("#levelup-close").addEventListener("click", () => { $("#modal-levelup").hidden = true; });
 
 renderBristolLegend();
 applyTheme();
 renderAll();
 
-if (!state.profile || !state.profile.lignee) {
-  /* nouvel arrivant, ou ancien profil d'avant l'état civil intestinal */
+if (!state.profile || !state.profile.lignee || !state.profile.skills || !state.profile.portrait) {
+  /* nouvel arrivant, ou profil d'avant la grande réforme du greffe */
   openWizard();
 } else {
   handleIncomingLinks();
