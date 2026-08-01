@@ -17,6 +17,9 @@ python3 -m http.server 8000
 
 ## Fonctionnalités
 
+- **L'Acte d'enregistrement** — à la première visite, créez votre personnage comme dans un jeu de rôle : choisissez votre **lignée** (Colon Nordique, Elfe des Sous-Bois, Nain des Faïences, Gobelin de Bureau, Ondin des Marais — chacune avec son trait), votre **vocation** (Chevalier de la Faïence, Alchimiste des Entrailles, Barde du Trône, Moine du Silence, Rôdeur des Latrines), votre **guilde** (Confrérie de l'Aube, Ordre du Zénith, Cercle du Crépuscule, Loge de Minuit) et composez votre **blason héraldique** (six symboles, six couleurs).
+- **Niveaux et expérience** — chaque événement (+10 XP), télégramme (+5) et distinction (+25) fait progresser votre rang, de *Novice du Trône* jusqu'à *Légende Vivante du Trône*, en passant par *Compagnon de Selle*, *Baron de la Faïence* ou *Duc du Bristol*. Votre titre signe vos télégrammes et figure sur votre carte de visite.
+- **La Fiche de personnage** — onglet Profil : blason, titre, barre d'expérience, lignée, vocation, guilde et hauts faits. L'acte est modifiable à tout moment (l'expérience, elle, reste acquise).
 - **La Carte** — cliquez pour situer l'événement, chaque pastille sépia est un souvenir. Fond de carte OpenStreetMap patiné façon vieille gravure.
 - **Le Procès-verbal** — chaque événement est consigné avec :
   - l'**échelle de Bristol** (types I à VII, classification médicale authentique) ;

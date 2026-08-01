@@ -36,6 +36,8 @@
     <span class="nav-sep">·</span>
     <button class="nav-link" data-view="cercle">Le Cercle<span class="nav-badge" id="cercle-badge" hidden></span></button>
     <span class="nav-sep">·</span>
+    <button class="nav-link" data-view="profil">Profil</button>
+    <span class="nav-sep">·</span>
     <button class="nav-link" data-view="statistiques">Statistiques</button>
     <span class="nav-sep">·</span>
     <button class="nav-link nav-theme" id="theme-toggle" title="Basculer entre l'édition du jour et l'édition de nuit">☾ Nuit</button>
@@ -96,6 +98,15 @@
         <h2 class="sheet-title">La Gazette</h2>
         <p class="sheet-sub">Les dernières dépêches du réseau.</p>
         <div id="feed-list"></div>
+      </div>
+    </section>
+
+    <!-- ==================== PROFIL ==================== -->
+    <section class="view" id="view-profil">
+      <div class="sheet">
+        <h2 class="sheet-title">Fiche de personnage</h2>
+        <p class="sheet-sub">Acte officiel d&rsquo;état civil intestinal, établi en bonne et due forme.</p>
+        <div id="profil-card"></div>
       </div>
     </section>
 
@@ -198,17 +209,17 @@
     </div>
   </div>
 
-  <!-- ==================== MODALE : ONBOARDING ==================== -->
+  <!-- ==================== MODALE : ACTE D'ENREGISTREMENT ==================== -->
   <div class="modal-backdrop" id="modal-onboard" hidden>
-    <div class="modal" role="dialog" aria-modal="true">
-      <h2 class="modal-title">Bienvenue au registre</h2>
-      <p class="sheet-sub">Avant toute chose, sous quel nom souhaitez-vous être inscrit&nbsp;?</p>
-      <form id="onboard-form">
-        <input type="text" id="onboard-name" maxlength="24" placeholder="Ex. : A. de Selle" autocomplete="off" required>
-        <div class="modal-actions">
-          <button type="submit" class="btn btn-primary">Parapher le registre</button>
-        </div>
-      </form>
+    <div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="wizard-title">
+      <div class="modal-stamp">Acte officiel</div>
+      <h2 class="modal-title" id="wizard-title">Acte d&rsquo;enregistrement</h2>
+      <p class="sheet-sub" id="wizard-sub">&nbsp;</p>
+      <div id="wizard-body"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="wizard-back">Retour</button>
+        <button type="button" class="btn btn-primary" id="wizard-next">Continuer</button>
+      </div>
     </div>
   </div>
 

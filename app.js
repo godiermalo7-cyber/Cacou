@@ -53,6 +53,55 @@ const BADGES = [
   { id: "telegraphiste", name: "Télégraphiste",  desc: "Aviser le Cercle à dix reprises.", test: (s) => (s.telegramCount || 0) >= 10 },
 ];
 
+/* ---------- État civil intestinal (création de personnage) ---------- */
+
+const LIGNEES = [
+  { id: "colon",   name: "Colon Nordique",      desc: "Peuple des fjords intérieurs. Entrailles de granit, ponctualité de glacier.", trait: "Imperturbable — aucun Type I ne saurait l'émouvoir." },
+  { id: "elfe",    name: "Elfe des Sous-Bois",  desc: "Ne s'épanouit qu'à l'air libre, de préférence adossé à un chêne centenaire.", trait: "Communion — en pleine nature, sa prestance est sans égale." },
+  { id: "nain",    name: "Nain des Faïences",   desc: "Bâtisseur des trônes ancestraux. Ne quitte le domicile qu'à contrecœur.", trait: "Forteresse — chez lui, nul ne l'attend, nul ne le presse." },
+  { id: "gobelin", name: "Gobelin de Bureau",   desc: "Opportuniste des heures ouvrées, rémunéré pour ce qu'il fait de mieux.", trait: "Salarié — chaque séance au travail est une victoire sociale." },
+  { id: "ondin",   name: "Ondin des Marais",    desc: "Lignée fluide, forgée par mille tempêtes intestines.", trait: "Écume — les Types VI et VII ne lui inspirent aucune crainte." },
+];
+
+const VOCATIONS = [
+  { id: "chevalier",  name: "Chevalier de la Faïence",    desc: "L'honneur, la tenue, le panache. Jamais un procès-verbal bâclé." },
+  { id: "alchimiste", name: "Alchimiste des Entrailles",  desc: "Observe, classe, conclut. L'échelle de Bristol est son grimoire." },
+  { id: "barde",      name: "Barde du Trône",             desc: "Rien ne reste secret : tout finit en télégramme, puis en chanson." },
+  { id: "moine",      name: "Moine du Silence",           desc: "Vœu de discrétion perpétuelle. Empreinte sonore : monacale, toujours." },
+  { id: "rodeur",     name: "Rôdeur des Latrines",        desc: "Cartographe de l'inconnu. Aucun édifice public ne lui résiste." },
+];
+
+const GUILDES = [
+  { id: "aube",       name: "Confrérie de l'Aube",     desc: "Officie avant le chant du coq. Le monde entier lui appartient." },
+  { id: "zenith",     name: "Ordre du Zénith",          desc: "Midi sonnant. La régularité érigée en dogme sacré." },
+  { id: "crepuscule", name: "Cercle du Crépuscule",     desc: "Quand le jour décline, la confrérie s'éveille." },
+  { id: "minuit",     name: "Loge de Minuit",           desc: "Société très discrète. Il ne s'y passe rien d'avouable." },
+];
+
+const BLASON_SYMBOLS = ["❦", "⚜", "♜", "♞", "☾", "✶"];
+
+const BLASON_COLORS = [
+  { id: "sceau",     hex: "#a33d2c", name: "Rouge de sceau" },
+  { id: "encre",     hex: "#2b2620", name: "Encre" },
+  { id: "bronze",    hex: "#8b5e3c", name: "Bronze" },
+  { id: "bouteille", hex: "#3d5a3d", name: "Vert bouteille" },
+  { id: "nuit",      hex: "#2e3a55", name: "Bleu de nuit" },
+  { id: "prune",     hex: "#5a3550", name: "Prune" },
+];
+
+const NIVEAUX = [
+  { xp: 0,    titre: "Novice du Trône" },
+  { xp: 50,   titre: "Apprenti Greffier" },
+  { xp: 120,  titre: "Compagnon de Selle" },
+  { xp: 220,  titre: "Sergent des Commodités" },
+  { xp: 360,  titre: "Maître des Lieux d'Aisance" },
+  { xp: 540,  titre: "Baron de la Faïence" },
+  { xp: 780,  titre: "Vicomte des Vapeurs" },
+  { xp: 1080, titre: "Duc du Bristol" },
+  { xp: 1450, titre: "Archiduc des Entrailles" },
+  { xp: 1900, titre: "Légende Vivante du Trône" },
+];
+
 /* ---------- Le Cercle (correspondants de démonstration) ---------- */
 
 const FRIENDS = [
@@ -88,6 +137,10 @@ function loadState() {
   if (!Array.isArray(s.receivedTelegrams)) s.receivedTelegrams = [];
   if (!s.theme) s.theme = "jour";
   if (s.profile && !s.profile.id) s.profile.id = newId("u");
+  if (typeof s.xp !== "number") {
+    /* attribution rétroactive : le passé compte aussi */
+    s.xp = (s.entries ? s.entries.length * 10 : 0) + (s.telegramCount || 0) * 5;
+  }
   return s;
 }
 
@@ -139,6 +192,48 @@ function relTime(hoursAgo) {
 function labelOf(list, id) {
   const found = list.find((x) => x.id === id);
   return found ? found.label : id;
+}
+
+/* ---------- Niveaux, expérience & blason ---------- */
+
+function levelInfo(xp) {
+  let idx = 0;
+  for (let i = 0; i < NIVEAUX.length; i++) if (xp >= NIVEAUX[i].xp) idx = i;
+  return {
+    niveau: idx + 1,
+    titre: NIVEAUX[idx].titre,
+    floor: NIVEAUX[idx].xp,
+    next: NIVEAUX[idx + 1] || null,
+  };
+}
+
+function currentTitle() {
+  return levelInfo(state.xp || 0).titre;
+}
+
+function addXp(amount) {
+  const before = levelInfo(state.xp || 0).niveau;
+  state.xp = (state.xp || 0) + amount;
+  const after = levelInfo(state.xp);
+  if (after.niveau > before) {
+    setTimeout(() => toast(`AVANCEMENT — Vous voilà ${after.titre} (niveau ${after.niveau}). Le Cercle s'incline.`), 900);
+  }
+}
+
+function crestSvg(symbol, colorHex) {
+  const s = esc(symbol) + "︎"; /* force le rendu gravure, pas emoji */
+  const c = esc(colorHex);
+  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <circle cx="50" cy="50" r="46" fill="#fffdf7" stroke="${c}" stroke-width="3.5"/>
+    <circle cx="50" cy="50" r="38" fill="none" stroke="${c}" stroke-width="1.5" opacity="0.4"/>
+    <text x="50" y="54" text-anchor="middle" dominant-baseline="middle" font-size="40"
+      font-family="Georgia, 'DejaVu Serif', serif" fill="${c}">${s}</text>
+  </svg>`;
+}
+
+function profileCrestSvg() {
+  const b = (state.profile && state.profile.blason) || { s: "❦", c: "#a33d2c" };
+  return crestSvg(b.s, b.c);
 }
 
 /* codes portables (base64url d'un JSON) pour cartes de visite et télégrammes */
@@ -351,18 +446,19 @@ $("#entry-form").addEventListener("submit", (e) => {
     discretion: draft.discretion,
     comment: $("#entry-comment").value.trim(),
   };
+  const before = earnedBadgeIds();
   state.entries.unshift(entry);
 
   const sendTelegram = $("#entry-telegram").checked;
   if (sendTelegram) state.telegramCount = (state.telegramCount || 0) + 1;
 
-  const before = earnedBadgeIds();
+  const after = earnedBadgeIds();
+  const fresh = after.filter((id) => !before.includes(id));
+  addXp(10 + (sendTelegram ? 5 : 0) + fresh.length * 25);
+
   saveState();
   renderAll();
   $("#modal-entry").hidden = true;
-
-  const after = earnedBadgeIds();
-  const fresh = after.filter((id) => !before.includes(id));
 
   if (sendTelegram) {
     const text = outgoingTelegramText(entry);
@@ -392,7 +488,8 @@ function outgoingTelegramText(entry) {
     `LIEU : ${lieu} STOP`,
     `BRISTOL ${roman(entry.bristol)} — ${b.verdict.toUpperCase()} STOP`,
     `APPRÉCIATION : ${entry.note} ÉTOILE${entry.note > 1 ? "S" : ""} SUR CINQ STOP`,
-    `AUCUNE RÉPONSE ATTENDUE STOP FIN`,
+    `AUCUNE RÉPONSE ATTENDUE STOP`,
+    `SIGNÉ : ${state.profile.name.toUpperCase()}, ${currentTitle().toUpperCase()} STOP FIN`,
   ].join("\n");
 }
 
@@ -402,7 +499,11 @@ function telegramShareLink(text) {
 }
 
 function cardShareLink() {
-  return appUrl() + "?ami=" + encodeCode({ v: 1, id: state.profile.id, name: state.profile.name });
+  const b = state.profile.blason;
+  return appUrl() + "?ami=" + encodeCode({
+    v: 1, id: state.profile.id, name: state.profile.name,
+    t: currentTitle(), b: b ? [b.s, b.c] : undefined,
+  });
 }
 
 function pokeTelegramText(friend, me) {
@@ -411,7 +512,7 @@ function pokeTelegramText(friend, me) {
     ``,
     `PENSÉE ÉMUE DEPUIS LE TRÔNE STOP`,
     `VOUS SAUREZ QUOI FAIRE STOP`,
-    `SIGNÉ : ${me.toUpperCase()} STOP FIN`,
+    `SIGNÉ : ${me.toUpperCase()}, ${currentTitle().toUpperCase()} STOP FIN`,
   ].join("\n");
 }
 
@@ -506,6 +607,7 @@ function renderFriends() {
     const btn = el("button", "btn btn-ghost btn-small", "Adresser un télégramme");
     btn.addEventListener("click", () => {
       state.telegramCount = (state.telegramCount || 0) + 1;
+      addXp(5);
       saveState();
       renderBadges();
       showTelegram(pokeTelegramText(f, state.profile ? state.profile.name : "UN ANONYME"));
@@ -525,12 +627,18 @@ function renderRealFriends() {
   }
   state.realFriends.forEach((f) => {
     const card = el("div", "friend-card is-real");
+    if (f.blason) {
+      const crest = el("div", "friend-crest", crestSvg(f.blason[0], f.blason[1]));
+      card.appendChild(crest);
+    }
     card.appendChild(el("div", "friend-seal", "Correspondant certifié"));
     card.appendChild(el("div", "friend-name", esc(f.name)));
+    if (f.titre) card.appendChild(el("div", "friend-title", esc(f.titre)));
     card.appendChild(el("div", "friend-stat", `Au registre depuis le ${esc(fmtDate(f.addedAt))}.`));
     const btn = el("button", "btn btn-ghost btn-small", "Adresser un télégramme");
     btn.addEventListener("click", () => {
       state.telegramCount = (state.telegramCount || 0) + 1;
+      addXp(5);
       saveState();
       renderBadges();
       const text = pokeTelegramText(f, state.profile ? state.profile.name : "UN ANONYME");
@@ -570,7 +678,13 @@ function addFriendFromCode(raw) {
   if (state.realFriends.some((f) => f.id === data.id)) {
     return toast(`${data.name} figure déjà parmi vos correspondants.`);
   }
-  state.realFriends.push({ id: data.id, name: String(data.name).slice(0, 24), addedAt: new Date().toISOString() });
+  state.realFriends.push({
+    id: data.id,
+    name: String(data.name).slice(0, 24),
+    titre: data.t ? String(data.t).slice(0, 40) : null,
+    blason: Array.isArray(data.b) && data.b.length === 2 ? [String(data.b[0]).slice(0, 4), String(data.b[1]).slice(0, 12)] : null,
+    addedAt: new Date().toISOString(),
+  });
   saveState();
   renderRealFriends();
   toast(`${data.name} rejoint votre Cercle. Qu'on lui porte l'estime due.`);
@@ -578,7 +692,9 @@ function addFriendFromCode(raw) {
 
 function renderVisite() {
   if (!state.profile) return;
-  $("#visite-name").textContent = state.profile.name;
+  $("#visite-name").innerHTML =
+    `<span class="visite-crest">${profileCrestSvg()}</span>` +
+    `<span>${esc(state.profile.name)}<br><span class="profil-titre">${esc(currentTitle())}</span></span>`;
   const link = cardShareLink();
   const qrBox = $("#qr-box");
   qrBox.innerHTML = "";
@@ -820,27 +936,220 @@ document.querySelectorAll(".modal-backdrop").forEach((backdrop) => {
   });
 });
 
-/* ---------- Onboarding ---------- */
+/* ---------- L'Acte d'enregistrement (assistant de création) ---------- */
 
-$("#onboard-form").addEventListener("submit", (e) => {
-  e.preventDefault();
-  const name = $("#onboard-name").value.trim();
-  if (!name) return;
-  state.profile = { name, id: newId("u") };
+const wizard = { step: 0, name: "", lignee: null, vocation: null, guilde: null, symbol: null, color: null };
+
+const WIZARD_STEPS = [
+  { title: "Acte d'enregistrement", sub: "Avant toute chose, sous quel nom la postérité doit-elle vous connaître ?" },
+  { title: "Votre lignée", sub: "On ne choisit pas ses entrailles ; on choisit d'en être fier." },
+  { title: "Votre vocation", sub: "Tout personnage a une classe. La vôtre ne fait pas exception." },
+  { title: "Votre guilde", sub: "Dites-moi à quelle heure vous officiez, je vous dirai qui vous êtes." },
+  { title: "Votre blason", sub: "Les armes de votre maison, apposées sur chaque acte." },
+];
+
+function choiceCards(items, selectedId, onPick, withTrait) {
+  const grid = el("div", "choice-grid");
+  items.forEach((item) => {
+    const card = el("button", "choice-card" + (selectedId === item.id ? " is-on" : ""));
+    card.type = "button";
+    card.appendChild(el("div", "choice-name", esc(item.name)));
+    card.appendChild(el("div", "choice-desc", esc(item.desc)));
+    if (withTrait && item.trait) card.appendChild(el("div", "choice-trait", esc(item.trait)));
+    card.addEventListener("click", () => {
+      onPick(item.id);
+      [...grid.children].forEach((c) => c.classList.remove("is-on"));
+      card.classList.add("is-on");
+    });
+    grid.appendChild(card);
+  });
+  return grid;
+}
+
+function renderWizardStep() {
+  const stepDef = WIZARD_STEPS[wizard.step];
+  $("#wizard-title").textContent = stepDef.title;
+  $("#wizard-sub").textContent = stepDef.sub;
+  $("#wizard-back").style.visibility = wizard.step === 0 ? "hidden" : "visible";
+  $("#wizard-next").textContent = wizard.step === WIZARD_STEPS.length - 1 ? "Parapher l'acte" : "Continuer";
+
+  const body = $("#wizard-body");
+  body.innerHTML = "";
+
+  if (wizard.step === 0) {
+    const input = el("input");
+    input.type = "text"; input.id = "onboard-name"; input.maxLength = 24;
+    input.placeholder = "Ex. : A. de Selle"; input.autocomplete = "off";
+    input.value = wizard.name;
+    input.addEventListener("input", () => { wizard.name = input.value; });
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); $("#wizard-next").click(); } });
+    body.appendChild(input);
+    setTimeout(() => input.focus(), 50);
+  } else if (wizard.step === 1) {
+    body.appendChild(choiceCards(LIGNEES, wizard.lignee, (id) => { wizard.lignee = id; }, true));
+  } else if (wizard.step === 2) {
+    body.appendChild(choiceCards(VOCATIONS, wizard.vocation, (id) => { wizard.vocation = id; }));
+  } else if (wizard.step === 3) {
+    body.appendChild(choiceCards(GUILDES, wizard.guilde, (id) => { wizard.guilde = id; }));
+  } else {
+    if (!wizard.symbol) wizard.symbol = BLASON_SYMBOLS[0];
+    if (!wizard.color) wizard.color = BLASON_COLORS[0].hex;
+    const shop = el("div", "blason-workshop");
+    const preview = el("div", "blason-preview");
+    const refreshPreview = () => { preview.innerHTML = crestSvg(wizard.symbol, wizard.color); };
+    refreshPreview();
+    const choices = el("div", "blason-choices");
+    const symGrid = el("div", "symbol-grid");
+    BLASON_SYMBOLS.forEach((s) => {
+      const b = el("button", "symbol-btn" + (wizard.symbol === s ? " is-on" : ""), esc(s) + "︎");
+      b.type = "button";
+      b.addEventListener("click", () => {
+        wizard.symbol = s;
+        [...symGrid.children].forEach((c) => c.classList.remove("is-on"));
+        b.classList.add("is-on");
+        refreshPreview();
+      });
+      symGrid.appendChild(b);
+    });
+    const colGrid = el("div", "color-grid");
+    BLASON_COLORS.forEach((c) => {
+      const b = el("button", "color-btn" + (wizard.color === c.hex ? " is-on" : ""));
+      b.type = "button"; b.title = c.name; b.style.background = c.hex;
+      b.addEventListener("click", () => {
+        wizard.color = c.hex;
+        [...colGrid.children].forEach((x) => x.classList.remove("is-on"));
+        b.classList.add("is-on");
+        refreshPreview();
+      });
+      colGrid.appendChild(b);
+    });
+    choices.appendChild(symGrid);
+    choices.appendChild(colGrid);
+    const lig = LIGNEES.find((x) => x.id === wizard.lignee);
+    const voc = VOCATIONS.find((x) => x.id === wizard.vocation);
+    const gui = GUILDES.find((x) => x.id === wizard.guilde);
+    choices.appendChild(el("p", "wizard-summary",
+      `${esc(wizard.name || "?")}, ${esc(lig ? lig.name : "?")}, ${esc(voc ? voc.name : "?")}, membre de ${esc(gui ? gui.name : "?")}.`));
+    shop.appendChild(preview);
+    shop.appendChild(choices);
+    body.appendChild(shop);
+  }
+}
+
+function openWizard() {
+  if (state.profile) {
+    wizard.name = state.profile.name || "";
+    wizard.lignee = state.profile.lignee || null;
+    wizard.vocation = state.profile.vocation || null;
+    wizard.guilde = state.profile.guilde || null;
+    if (state.profile.blason) { wizard.symbol = state.profile.blason.s; wizard.color = state.profile.blason.c; }
+  }
+  wizard.step = 0;
+  renderWizardStep();
+  $("#modal-onboard").hidden = false;
+}
+
+$("#wizard-back").addEventListener("click", () => {
+  if (wizard.step > 0) { wizard.step--; renderWizardStep(); }
+});
+
+$("#wizard-next").addEventListener("click", () => {
+  if (wizard.step === 0 && !wizard.name.trim()) return toast("Un nom, je vous prie. L'anonymat n'a pas cours ici.");
+  if (wizard.step === 1 && !wizard.lignee) return toast("Toute personne descend de quelque part. Choisissez.");
+  if (wizard.step === 2 && !wizard.vocation) return toast("Sans vocation, point de salut. Choisissez.");
+  if (wizard.step === 3 && !wizard.guilde) return toast("Une guilde vous attend quelque part. Choisissez.");
+  if (wizard.step < WIZARD_STEPS.length - 1) {
+    wizard.step++;
+    renderWizardStep();
+    return;
+  }
+  /* paraphe final */
+  const isNew = !state.profile;
+  state.profile = {
+    id: (state.profile && state.profile.id) || newId("u"),
+    name: wizard.name.trim(),
+    lignee: wizard.lignee,
+    vocation: wizard.vocation,
+    guilde: wizard.guilde,
+    blason: { s: wizard.symbol, c: wizard.color },
+  };
   saveState();
   $("#modal-onboard").hidden = true;
   renderAll();
   handleIncomingLinks();
-  toast(`Bienvenue, ${name}. Le registre vous attendait.`);
-  setTimeout(() => {
-    if (!state.incomingSeen && $("#modal-entry").hidden) {
-      state.incomingSeen = true;
-      saveState();
-      $("#cercle-badge").hidden = false;
-      showTelegram(incomingTelegramText(name));
-    }
-  }, 900);
+  if (isNew) {
+    toast(`Bienvenue, ${state.profile.name}, ${currentTitle()}. Le registre vous attendait.`);
+    setTimeout(() => {
+      if (!state.incomingSeen && $("#modal-entry").hidden) {
+        state.incomingSeen = true;
+        saveState();
+        $("#cercle-badge").hidden = false;
+        showTelegram(incomingTelegramText(state.profile.name));
+      }
+    }, 900);
+  } else {
+    toast("L'acte a été mis à jour. Le greffe vous salue.");
+  }
 });
+
+/* ---------- Fiche de personnage ---------- */
+
+function renderProfil() {
+  const box = $("#profil-card");
+  if (!box) return;
+  box.innerHTML = "";
+  if (!state.profile) return;
+  const p = state.profile;
+  const info = levelInfo(state.xp || 0);
+
+  const head = el("div", "profil-head");
+  head.appendChild(el("div", "profil-crest", profileCrestSvg()));
+  const idBlock = el("div");
+  idBlock.appendChild(el("div", "profil-name", esc(p.name)));
+  idBlock.appendChild(el("div", "profil-titre", esc(info.titre)));
+  idBlock.appendChild(el("div", "profil-niveau",
+    `Niveau ${info.niveau} — ${state.xp || 0} points d'expérience`));
+  const track = el("div", "xp-track");
+  const fill = el("div", "xp-fill");
+  if (info.next) {
+    const span = info.next.xp - info.floor;
+    fill.style.width = `${Math.min(100, Math.round((((state.xp || 0) - info.floor) / span) * 100))}%`;
+  } else {
+    fill.style.width = "100%";
+  }
+  track.appendChild(fill);
+  idBlock.appendChild(track);
+  idBlock.appendChild(el("div", "xp-caption", info.next
+    ? `Encore ${info.next.xp - (state.xp || 0)} points avant le rang de ${esc(info.next.titre)}.`
+    : "Le sommet est atteint. Il ne reste qu'à régner."));
+  head.appendChild(idBlock);
+  box.appendChild(head);
+
+  const attrs = el("div", "profil-attrs");
+  const lig = LIGNEES.find((x) => x.id === p.lignee);
+  const voc = VOCATIONS.find((x) => x.id === p.vocation);
+  const gui = GUILDES.find((x) => x.id === p.guilde);
+  [["Lignée", lig, true], ["Vocation", voc, false], ["Guilde", gui, false]].forEach(([kind, item, withTrait]) => {
+    const card = el("div", "attr-card");
+    card.appendChild(el("div", "attr-kind", kind));
+    card.appendChild(el("div", "attr-name", esc(item ? item.name : "Non renseigné")));
+    if (item) card.appendChild(el("div", "attr-desc", esc(item.desc)));
+    if (withTrait && item && item.trait) card.appendChild(el("div", "attr-trait", esc(item.trait)));
+    attrs.appendChild(card);
+  });
+  const feats = el("div", "attr-card");
+  feats.appendChild(el("div", "attr-kind", "Hauts faits"));
+  feats.appendChild(el("div", "attr-name", `${earnedBadgeIds().length} distinction${earnedBadgeIds().length > 1 ? "s" : ""} sur ${BADGES.length}`));
+  feats.appendChild(el("div", "attr-desc", `${state.entries.length} événement${state.entries.length > 1 ? "s" : ""} consignés, ${state.realFriends.length} correspondant${state.realFriends.length > 1 ? "s" : ""} certifiés.`));
+  attrs.appendChild(feats);
+  box.appendChild(attrs);
+
+  const actions = el("div", "profil-actions");
+  const editBtn = el("button", "btn btn-ghost", "Modifier l'acte");
+  editBtn.addEventListener("click", openWizard);
+  actions.appendChild(editBtn);
+  box.appendChild(actions);
+}
 
 /* ---------- Édition de nuit ---------- */
 
@@ -915,14 +1224,16 @@ function renderAll() {
   renderFeed();
   renderStats();
   renderBadges();
+  renderProfil();
 }
 
 renderBristolLegend();
 applyTheme();
 renderAll();
 
-if (!state.profile) {
-  $("#modal-onboard").hidden = false;
+if (!state.profile || !state.profile.lignee) {
+  /* nouvel arrivant, ou ancien profil d'avant l'état civil intestinal */
+  openWizard();
 } else {
   handleIncomingLinks();
   if (state.entries.length && state.entries[0].lat) {

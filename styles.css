@@ -285,6 +285,69 @@ main { max-width: 880px; margin: 0 auto; padding: 0 1rem 3rem; }
   margin-bottom: 0.25rem;
 }
 
+/* ---------- Acte d'enregistrement (création de personnage) ---------- */
+
+.modal-wide { max-width: 640px; }
+.choice-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.7rem; }
+.choice-card {
+  border: 1px solid var(--line); background: none; cursor: pointer;
+  padding: 0.8rem 0.95rem; text-align: left; font-family: var(--serif);
+  color: var(--ink); transition: border-color 0.15s ease;
+}
+.choice-card:hover { border-color: var(--accent); }
+.choice-card.is-on { border-color: var(--ink); outline: 1px solid var(--ink); outline-offset: 2px; }
+.choice-name { font-weight: 600; font-size: 1rem; }
+.choice-desc { font-size: 0.85rem; color: var(--ink-soft); font-style: italic; margin-top: 0.15rem; }
+.choice-trait { font-size: 0.8rem; color: var(--accent-deep); margin-top: 0.3rem; }
+.choice-trait::before { content: "✳ "; color: var(--seal); }
+
+.blason-workshop { display: flex; gap: 1.4rem; flex-wrap: wrap; align-items: flex-start; }
+.blason-preview { flex: 0 0 auto; width: 132px; }
+.blason-preview svg { width: 132px; height: 132px; }
+.blason-choices { flex: 1; min-width: 220px; }
+.symbol-grid, .color-grid { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.9rem; }
+.symbol-btn {
+  width: 2.6rem; height: 2.6rem; font-size: 1.4rem; line-height: 1;
+  border: 1px solid var(--line); background: none; cursor: pointer;
+  color: var(--ink); font-family: var(--serif);
+}
+.symbol-btn.is-on { border-color: var(--ink); outline: 1px solid var(--ink); outline-offset: 2px; }
+.color-btn {
+  width: 2.1rem; height: 2.1rem; border-radius: 50%; cursor: pointer;
+  border: 2px solid var(--paper); box-shadow: 0 0 0 1px var(--line);
+}
+.color-btn.is-on { box-shadow: 0 0 0 2px var(--ink); }
+.wizard-summary { font-style: italic; color: var(--ink-soft); font-size: 0.9rem; margin-top: 0.6rem; }
+
+/* ---------- Fiche de personnage ---------- */
+
+.profil-head { display: flex; gap: 1.6rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.4rem; }
+.profil-crest svg { width: 120px; height: 120px; }
+.profil-name { font-size: 1.6rem; font-weight: 600; line-height: 1.2; }
+.profil-titre { font-variant: small-caps; letter-spacing: 0.12em; color: var(--accent-deep); }
+.profil-niveau { color: var(--ink-faint); font-size: 0.9rem; }
+.xp-track {
+  background: var(--paper-deep); height: 0.8rem; border: 1px solid var(--line);
+  margin-top: 0.5rem; max-width: 320px;
+}
+.xp-fill { background: var(--accent); height: 100%; transition: width 0.4s ease; }
+.xp-caption { font-size: 0.8rem; color: var(--ink-faint); font-style: italic; margin-top: 0.25rem; }
+.profil-attrs { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 0.9rem; }
+.attr-card { border: 1px solid var(--line); padding: 0.85rem 1rem; }
+.attr-kind {
+  font-variant: small-caps; letter-spacing: 0.12em; font-size: 0.72rem;
+  color: var(--ink-faint);
+}
+.attr-name { font-weight: 600; }
+.attr-desc { font-size: 0.83rem; color: var(--ink-soft); font-style: italic; }
+.attr-trait { font-size: 0.8rem; color: var(--accent-deep); margin-top: 0.3rem; }
+.attr-trait::before { content: "✳ "; color: var(--seal); }
+.profil-actions { margin-top: 1.4rem; }
+.visite-name { display: flex; align-items: center; gap: 0.6rem; }
+.visite-crest svg { width: 46px; height: 46px; display: block; }
+.friend-crest { float: right; margin-left: 0.5rem; }
+.friend-crest svg { width: 36px; height: 36px; display: block; }
+
 /* ---------- Séparateur de mois (journal) ---------- */
 
 .journal-month {
